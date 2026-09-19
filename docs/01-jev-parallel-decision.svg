@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Jev 机制拆解：KV-Cache 广播与并行单步决策</title>
+  <desc id="desc">展示 Jev 跳过逐字自回归生成的原理：通过上下文 Prefill、KV-Cache 沿 Batch 维度广播、预编译字段后缀并行前向传播、子词表 Logit 切片与确定性程序组装，实现高并发、零语法幻觉的结构化决策。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#64748b" stroke-width="2"/></marker>
+    <style>
+      text { font-family:"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif; fill:#182b40; }
+      .eyebrow { font-size:16px; font-weight:600; letter-spacing:2px; fill:#486680; }
+      .title { font-size:36px; font-weight:700; }
+      .sub { font-size:21px; fill:#51667b; }
+      .heading { font-size:24px; font-weight:600; }
+      .body { font-size:20px; }
+      .small { font-size:18px; fill:#51667b; }
+      .arrow { fill:none; stroke:#64748b; stroke-width:2.5; marker-end:url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1200" height="760" rx="24" fill="#f4f7fb"/>
+
+  <g transform="translate(0 -170)">
+
+  <!-- Step 1: Context & Schema -->
+  <rect x="52" y="190" width="510" height="88" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="228" class="heading">1. 输入上下文 Context + Schema</text>
+  <text x="76" y="258" class="small">结构化业务上下文与决策需求（预定义候选空间）</text>
+
+  <!-- Step 3: Suffix Batch -->
+  <rect x="638" y="190" width="510" height="88" rx="14" fill="#edf2f8" stroke="#c3d7f5"/>
+  <text x="662" y="228" class="heading">3. 预编译字段后缀 Suffix Batch</text>
+  <text x="662" y="258" class="small">预生成 M 个字段的提示前缀（如 ' "field_i": '）</text>
+
+  <!-- Arrow Step 1 -> Step 2 -->
+  <path d="M307 278 V310" class="arrow"/>
+
+  <!-- Step 2: Prefill Context -->
+  <rect x="52" y="316" width="510" height="88" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="354" class="heading">2. 单次 Prefill 预填充</text>
+  <text x="76" y="384" class="small">仅对 Context 计算一次前向，生成初始 KV-Cache</text>
+
+  <!-- Arrow Step 2 -> Step 4 -->
+  <path d="M307 404 V436" class="arrow"/>
+
+  <!-- Step 4: KV-Cache Broadcast -->
+  <rect x="52" y="442" width="510" height="88" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="480" class="heading">4. KV-Cache 广播 (Broadcast)</text>
+  <text x="76" y="510" class="small">将 Context 的 KV-Cache 沿 Batch 维度广播扩展 M 份</text>
+
+  <!-- Connectors into Step 5 -->
+  <path d="M307 530 V562" class="arrow"/>
+  <path d="M893 278 V562" class="arrow"/>
+
+  <!-- Step 5: Batched Forward Pass -->
+  <rect x="52" y="568" width="1096" height="96" rx="16" fill="#f3fbf8" stroke="#b8ded3"/>
+  <text x="80" y="608" class="heading">5. 单次并发批量前向传播 (Single Batched Forward Pass)</text>
+  <text x="80" y="640" class="body">M 个字段并行计算 Next-token Logits，计算复杂度从 O(M × 序列长) 降至 O(1) 前向</text>
+
+  <!-- Arrow Step 5 -> Step 6 -->
+  <path d="M314.5 664 V696" class="arrow"/>
+
+  <!-- Step 6: Logit Slicing -->
+  <rect x="52" y="702" width="525" height="92" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="740" class="heading">6. 候选子词表 Logit 切片</text>
+  <text x="76" y="770" class="small">屏蔽数万无关 Token，仅保留有界合法 Choice</text>
+
+  <!-- Arrow Step 6 -> Step 7 -->
+  <path d="M577 748 H615" class="arrow"/>
+
+  <!-- Step 7: Softmax Scoring -->
+  <rect x="623" y="702" width="525" height="92" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="647" y="740" class="heading">7. 归一化 Softmax 决策打分</text>
+  <text x="647" y="770" class="small">计算候选相对得分，选出各字段最优选项</text>
+
+  <!-- Arrow Step 7 -> Step 8 -->
+  <path d="M885.5 794 V824" class="arrow"/>
+
+  <!-- Step 8: Deterministic JSON Assembly -->
+  <rect x="52" y="830" width="1096" height="74" rx="14" fill="#182f47"/>
+  <text x="600" y="865" text-anchor="middle" style="fill:#fff;font-size:22px;font-weight:600">8. 确定性程序组装 JSON 结构体</text>
+  <text x="600" y="891" text-anchor="middle" style="fill:#d2e1ef;font-size:17px">由外部宿主代码按 Schema 填入决策结果，100% 语法合法，彻底根除格式解析错误</text>
+
+  </g>
+</svg>

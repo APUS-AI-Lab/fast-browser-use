@@ -1,0 +1,36 @@
+{
+  "hugging_face": {
+    "repo": "mlx-community/Qwen3.5-9B-4bit",
+    "revision": "8b2b98c00a6b4d291155e4890773ca8f769aee53"
+  },
+  "modelscope": {
+    "repo": "mlx-community/Qwen3.5-9B-4bit",
+    "revision": "27ab860cfc825df921f0ac1453133f3fa963a7f2"
+  },
+  "checked_at": "2026-09-19",
+  "note": "The measured ModelScope copy matches Hugging Face pinned metadata: SHA-256 for LFS files, Git blob SHA-1 for other files. No weight download performed during validation.",
+  "matching_files": {
+    "model-00001-of-00002.safetensors": {
+      "sha256": "a68b87558c6ef43f74c2bd63ce7e9092ceddc3101f3def0030774bae5f42aadd"
+    },
+    "model-00002-of-00002.safetensors": {
+      "sha256": "b0a770bf8469c7f3f18756a0e0283f1c1174344a83e059a4e483f6af4907352d"
+    },
+    "tokenizer.json": {
+      "sha256": "87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4",
+      "git_blob_sha1": "b561cafdcf4f484cc19fb9e8d403d2a223a782e6"
+    },
+    "tokenizer_config.json": {
+      "sha256": "e98f1901ac6f0adff67b1d540bfa0c36ac1a0cf59eb72ed78146ef89aafa1182",
+      "git_blob_sha1": "a068e2468cff426a9b105006e74e044030a6faf4"
+    },
+    "chat_template.jinja": {
+      "sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+      "git_blob_sha1": "a585dec894e63da457d9440ec6aa7caa16d20860"
+    },
+    "config.json": {
+      "sha256": "a96942cb6a8a1d3f1d17514d81a1925d04362a6a3233b389d13012211baaa9f8",
+      "git_blob_sha1": "0435ae3f4b3c8b907f7359a2f8f7150d316f3435"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="380" viewBox="0 0 1440 380">
+<rect width="1440" height="380" rx="24" fill="#172820"/>
+<g font-family="Arial,Helvetica,sans-serif">
+<text x="64" y="66" fill="#b8d0b7" font-size="15" letter-spacing="4">LOCAL INTELLIGENCE. REAL BROWSER ACTIONS.</text>
+<text x="60" y="175" fill="#f3f5e9" font-size="83" font-weight="700" letter-spacing="-4">fast / browser</text>
+<text x="65" y="241" fill="#bce993" font-size="27">A choice. An action. On your machine.</text>
+<text x="65" y="326" fill="#b8d0b7" font-size="18">QWEN3.5 9B   /   MLX   /   NO INFERENCE API</text>
+<rect x="992" y="68" width="378" height="238" rx="15" fill="#223c2e" stroke="#4b6a51"/>
+<circle cx="1015" cy="90" r="4" fill="#bce993"/><circle cx="1032" cy="90" r="4" fill="#76916c"/>
+<text x="1019" y="143" fill="#b8d0b7" font-size="18">CURRENT PAGE → LEGAL ACTIONS</text>
+<rect x="1013" y="163" width="337" height="52" rx="8" fill="#bce993"/>
+<text x="1034" y="196" fill="#172820" font-size="21" font-weight="700">A   CLICK  “Read article”</text>
+<text x="1034" y="255" fill="#a9bdaa" font-size="20">B   SCROLL DOWN</text>
+</g></svg>

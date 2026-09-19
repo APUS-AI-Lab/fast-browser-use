@@ -1,0 +1,17 @@
+Fast Browser Use contains code adapted from Jev Ultrafast:
+https://github.com/browser-use/jev-ultrafast
+Reference revision: 452c1ad2dd628008f1d5608f28158d76e49e6cc0
+Copyright (c) 2026 Browser Use. MIT License (see LICENSE).
+
+Adapted components include the guarded DOM reader, browser execution,
+agent lifecycle, inspector, fixtures, and browser guard tests.
+Local Qwen3.5-9B inference, joint action scoring, isolated Playwright transport,
+recording workflow, and project packaging are modifications in this project.
+
+This is an independent project, not an official Browser Use or Qwen product.
+Model weights are downloaded separately and are not distributed in this repository.
+Consult the selected model repository for its weight license and attribution.
+
+This project also draws ideas and inspiration from:
+- openjev: https://github.com/TheoLeeCJ/openjev
+- Qwen-2.5-1B-RLCD: https://huggingface.co/harshatheg/Qwen-2.5-1B-RLCD

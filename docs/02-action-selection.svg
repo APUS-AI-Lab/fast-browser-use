@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="616" viewBox="0 0 1200 616" role="img" aria-labelledby="title desc">
+  <title id="title">从生成动作文本到选择完整候选</title>
+  <desc id="desc">对比传统LLM驱动的 browser-use 与 fast-browser-use skill。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#64748b" stroke-width="2"/></marker>
+    <style>
+      text { font-family:"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif; fill:#182b40; }
+      .heading { font-size:26px; font-weight:600; }
+      .body { font-size:22px; }
+      .small { font-size:19px; fill:#51667b; }
+      .arrow { fill:none; stroke:#64748b; stroke-width:2.5; marker-end:url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1200" height="616" rx="24" fill="#f4f7fb"/>
+
+  <g transform="translate(0 -138)">
+    <!-- Left Card: 传统LLM驱动的 browser-use -->
+    <rect x="52" y="190" width="532" height="512" rx="18" fill="#fff" stroke="#d4deea"/>
+    <text x="318" y="239" text-anchor="middle" class="heading">传统LLM驱动的 browser-use</text>
+    
+    <!-- Left Box 1 -->
+    <rect x="90" y="269" width="456" height="102" rx="12" fill="#edf2f8"/>
+    <text x="318" y="311" text-anchor="middle" class="body">页面文本、控件信息或截图</text>
+    <text x="318" y="343" text-anchor="middle" class="small">根据接口组织模型输入</text>
+    
+    <path d="M318 374 V402" class="arrow"/>
+    
+    <!-- Left Box 2 -->
+    <rect x="90" y="408" width="456" height="102" rx="12" fill="#edf2f8"/>
+    <text x="318" y="467" text-anchor="middle" class="body">生成工具调用、参数或操作代码</text>
+    
+    <path d="M318 514 V554" class="arrow"/>
+    
+    <!-- Left Box 3 -->
+    <rect x="90" y="560" width="456" height="102" rx="12" fill="#edf2f8"/>
+    <text x="318" y="602" text-anchor="middle" class="body">Harness执行工具/代码，返回结果</text>
+    <text x="318" y="635" text-anchor="middle" class="small">出错则回到上一步</text>
+    
+    <!-- Loop Arrow: 回到上一步的框 -->
+    <path d="M 546 625 H 555 Q 565 625 565 615 V 469 Q 565 459 555 459 H 546" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+    <!-- Right Card: fast-browser-use skill -->
+    <rect x="616" y="190" width="532" height="512" rx="18" fill="#f3fbf8" stroke="#b8ded3"/>
+    <text x="882" y="239" text-anchor="middle" class="heading">fast-browser-use skill</text>
+    
+    <!-- Right Box 1 -->
+    <rect x="654" y="269" width="456" height="102" rx="12" fill="#dfefe9"/>
+    <text x="882" y="311" text-anchor="middle" class="body">可见 DOM → 完整合法候选</text>
+    <text x="882" y="343" text-anchor="middle" class="small">操作 + 目标 + 已观察到的选项</text>
+    
+    <path d="M882 374 V402" class="arrow"/>
+    
+    <!-- Right Box 2 -->
+    <rect x="654" y="408" width="456" height="102" rx="12" fill="#dfefe9"/>
+    <text x="882" y="450" text-anchor="middle" class="body" style="font-size:20.5px">本地LLM + 单 Token 快速决策选择动作</text>
+    <text x="882" y="482" text-anchor="middle" class="small">唯一单 Token 编码 · next-token logits</text>
+    
+    <path d="M882 514 V554" class="arrow"/>
+    
+    <!-- Right Box 3 -->
+    <rect x="654" y="560" width="456" height="102" rx="12" fill="#dfefe9"/>
+    <text x="882" y="602" text-anchor="middle" class="body">Harness 校验页面后放行</text>
+    <text x="882" y="635" text-anchor="middle" class="small">TYPE_TEXT 另行生成字段文本</text>
+  </g>
+</svg>

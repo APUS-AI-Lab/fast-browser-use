@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="616" viewBox="0 0 1200 616" role="img" aria-labelledby="title desc">
+  <title id="title">From Code Generation to Constrained Candidate Selection</title>
+  <desc id="desc">Comparing traditional LLM-driven browser automation with Fast Browser Use's constrained System 1 architecture.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#64748b" stroke-width="2"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill:#182b40; }
+      .heading { font-size:24px; font-weight:600; }
+      .body { font-size:20px; }
+      .small { font-size:16px; fill:#51667b; }
+      .arrow { fill:none; stroke:#64748b; stroke-width:2.5; marker-end:url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1200" height="616" rx="24" fill="#f4f7fb"/>
+
+  <g transform="translate(0 -138)">
+    <!-- Left Card: Traditional LLM-driven browser-use -->
+    <rect x="52" y="190" width="532" height="512" rx="18" fill="#fff" stroke="#d4deea"/>
+    <text x="318" y="239" text-anchor="middle" class="heading">Traditional Cloud LLM Agents</text>
+    
+    <!-- Left Box 1 -->
+    <rect x="90" y="269" width="456" height="102" rx="12" fill="#edf2f8"/>
+    <text x="318" y="310" text-anchor="middle" class="body">Raw HTML, DOM Dumps, or Screenshots</text>
+    <text x="318" y="342" text-anchor="middle" class="small">Massive unstructured context uploaded to cloud</text>
+    
+    <path d="M318 374 V402" class="arrow"/>
+    
+    <!-- Left Box 2 -->
+    <rect x="90" y="408" width="456" height="102" rx="12" fill="#edf2f8"/>
+    <text x="318" y="448" text-anchor="middle" class="body">Autoregressive Code / Tool Generation</text>
+    <text x="318" y="480" text-anchor="middle" class="small">3-8s decoding; prone to invented selectors</text>
+    
+    <path d="M318 514 V554" class="arrow"/>
+    
+    <!-- Left Box 3 -->
+    <rect x="90" y="560" width="456" height="102" rx="12" fill="#edf2f8"/>
+    <text x="318" y="600" text-anchor="middle" class="body">Harness Runs Playwright / Code</text>
+    <text x="318" y="632" text-anchor="middle" class="small">Runtime selector failure triggers retry loop</text>
+    
+    <!-- Loop Arrow: Retry -->
+    <path d="M 546 625 H 555 Q 565 625 565 615 V 469 Q 565 459 555 459 H 546" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+    <!-- Right Card: fast-browser-use skill -->
+    <rect x="616" y="190" width="532" height="512" rx="18" fill="#f3fbf8" stroke="#b8ded3"/>
+    <text x="882" y="239" text-anchor="middle" class="heading">Fast Browser Use (Local System 1)</text>
+    
+    <!-- Right Box 1 -->
+    <rect x="654" y="269" width="456" height="102" rx="12" fill="#dfefe9"/>
+    <text x="882" y="310" text-anchor="middle" class="body">Visible DOM → Legal Candidate Tuples</text>
+    <text x="882" y="342" text-anchor="middle" class="small">(Action, Target) from verified interactive elements</text>
+    
+    <path d="M882 374 V402" class="arrow"/>
+    
+    <!-- Right Box 2 -->
+    <rect x="654" y="408" width="456" height="102" rx="12" fill="#dfefe9"/>
+    <text x="882" y="448" text-anchor="middle" class="body">Single-Token Logits Decision</text>
+    <text x="882" y="480" text-anchor="middle" class="small">Unique single token · 50-200ms forward logits pass</text>
+    
+    <path d="M882 514 V554" class="arrow"/>
+    
+    <!-- Right Box 3 -->
+    <rect x="654" y="560" width="456" height="102" rx="12" fill="#dfefe9"/>
+    <text x="882" y="600" text-anchor="middle" class="body">Guarded Execution &amp; Trace Record</text>
+    <text x="882" y="632" text-anchor="middle" class="small">Physical checks before dispatch; TYPE_TEXT on demand</text>
+  </g>
+</svg>

@@ -1,0 +1,262 @@
+{
+  "goal": "Save workspace preferences with workspace name Orchard, timezone Asia/Singapore, and weekly digest enabled.",
+  "elapsed_ms": 11573,
+  "verification": {
+    "passed": true,
+    "checks": {
+      "title": true,
+      "text_1": true,
+      "text_2": true,
+      "text_3": true
+    },
+    "expected": {
+      "url": null,
+      "title": "Preferences saved",
+      "text": [
+        "Saved workspace: Orchard.",
+        "Timezone: Asia/Singapore.",
+        "Weekly digest: enabled."
+      ]
+    },
+    "observed": {
+      "url": "http://127.0.0.1:64318/settings.html",
+      "title": "Preferences saved"
+    }
+  },
+  "source_hashes": {
+    "verification.py": "2391a44ea3e4dd405424b48c63760598b5dece5b9daf56543d34c584fd24ff72",
+    "recording.py": "d7aca76224a1c84b4e7d856033a9aa3afe9dec6890e16da75e0d02cdc1fa895f",
+    "questions.py": "828ff445ff4df0a46f2c93a59b2c037b19a7b343cfe631ccd397c9534604ba18",
+    "actions.py": "ac8b4da4897a14759adde948a3386a07b02a9d343955b2c46b0e1fc6e57ad23d",
+    "__init__.py": "4056602cfb1aa9e79571368187cb1c89140d597c3aece3ae663589487358e3f4",
+    "model.py": "2e314c60f979959e4f52402b3707701578cdc9f9060f59ffc8200bff8c0261da",
+    "browser.py": "dbc8003f080cfcbb6047f56d7fd648083e07d809c3a929045a4164f725f703f8",
+    "cli.py": "b2360e50492245e5d409b5f9280fb38572b1f4be92741fd85efae6e28fdeccdf",
+    "snapshot.js": "f5510ca38f74460ce3c90cf3bd87781ef5c3fd199d166b3d3701b039fff85a7c",
+    "agent.py": "9c2bc0cd550c8c98b80a2a42a0ab4fe61637005e4ac5debe3544fb87b185309f",
+    "text_backend.py": "a257e4795ed8316c7e3ec9c39e142254e921db26bc2c908211788b032528e774",
+    "demo.py": "bdf937d3c4e3c242ff0be803459cf2d8b571131b194a948ee72b52142561e040",
+    "static/index.html": "0e2a2b594d5bd80e1ec6d4c0e1b1a2bf565dd184dd57bf3946d2849e49809a31",
+    "static/style.css": "50c71eac30836a19f97977018dcaaaede757aab1197bc5ec4e0dfcf159518a38",
+    "static/app.js": "9245cf4ccc65fc2c9af60189194e111351956d2815e4bb4bae7b2cbda890527c",
+    "static/fixture.html": "011b3d73d62e681a9b56df986ebebccd2ab68e9636cc1c08756dea0ace77a612"
+  },
+  "model": "mlx-community/Qwen3.5-9B-4bit",
+  "model_revision": null,
+  "runtime": {
+    "mlx": "0.32.2",
+    "mlx-lm": "0.31.3",
+    "transformers": "5.17.0",
+    "playwright": "1.63.0"
+  },
+  "hardware": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "chip": "Apple M2 Pro",
+    "memory_bytes": 34359738368
+  },
+  "model_load_ms": 1393,
+  "text_calls": [
+    {
+      "model": "mlx-community/Qwen3.5-9B-4bit",
+      "latency_ms": 1227,
+      "usage": {
+        "prompt_tokens": 187,
+        "completion_tokens": 5
+      },
+      "field": "Workspace name",
+      "value": "Orchard"
+    }
+  ],
+  "timing_boundary": "Warm model, after initial navigation/observation; all planning, decisions, text, actions, waits.",
+  "error": null,
+  "scenario": "custom",
+  "plan": [
+    "Save workspace preferences with workspace name Orchard, timezone Asia/Singapore, and weekly digest enabled."
+  ],
+  "plan_calls": [],
+  "milestones": [
+    "Save workspace preferences with workspace name Orchard, timezone Asia/Singapore, and weekly digest enabled."
+  ],
+  "summary": {
+    "task_ms": 11573,
+    "median_decision_ms": 1655.8,
+    "median_action_decision_ms": 1590.8049999999998,
+    "scoring_calls": 5,
+    "decisions": 5,
+    "rejected_decisions": 0,
+    "preparation_ms": 1349.65,
+    "actions": 4,
+    "text_calls": 1,
+    "plan_calls": 0,
+    "planning_ms": 0,
+    "reasoning_calls": 0,
+    "reasoning_ms": 0,
+    "verified": true,
+    "error": null
+  },
+  "request": null,
+  "final_page": {
+    "url": "http://127.0.0.1:64318/settings.html",
+    "title": "Preferences saved"
+  },
+  "recorded_at": "2026-09-19T03:20:06.545722+00:00",
+  "local_deliberation": false,
+  "configuration": {
+    "planning": false,
+    "decision_mode": "auto",
+    "settle_ms": 150
+  },
+  "rejections": [],
+  "observations": [
+    {
+      "latency_ms": 506.05,
+      "samples": 10,
+      "settled": true,
+      "elapsed_ms": 508
+    },
+    {
+      "latency_ms": 338.12,
+      "samples": 7,
+      "settled": true,
+      "elapsed_ms": 4583
+    },
+    {
+      "latency_ms": 171.62,
+      "samples": 4,
+      "settled": true,
+      "elapsed_ms": 6317
+    },
+    {
+      "latency_ms": 166.82,
+      "samples": 4,
+      "settled": true,
+      "elapsed_ms": 8046
+    },
+    {
+      "latency_ms": 167.04,
+      "samples": 4,
+      "settled": true,
+      "elapsed_ms": 9895
+    }
+  ],
+  "browser_locale": "en-US",
+  "browser_headless": true,
+  "decisions": [
+    {
+      "operation": "TYPE_TEXT",
+      "target": "1",
+      "latency_ms": 2439.34,
+      "usage": {
+        "prompt_tokens": 476,
+        "cached_tokens": 0,
+        "completion_tokens": 1
+      },
+      "cache_hit": false,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1
+    },
+    {
+      "operation": "SELECT",
+      "target": "2:1",
+      "latency_ms": 1525.81,
+      "usage": {
+        "prompt_tokens": 496,
+        "cached_tokens": 198,
+        "completion_tokens": 1
+      },
+      "cache_hit": true,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1
+    },
+    {
+      "operation": "CLICK",
+      "target": "3",
+      "latency_ms": 1519.99,
+      "usage": {
+        "prompt_tokens": 515,
+        "cached_tokens": 198,
+        "completion_tokens": 1
+      },
+      "cache_hit": true,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1
+    },
+    {
+      "operation": "CLICK",
+      "target": "4",
+      "latency_ms": 1655.8,
+      "usage": {
+        "prompt_tokens": 523,
+        "cached_tokens": 198,
+        "completion_tokens": 1
+      },
+      "cache_hit": true,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1
+    },
+    {
+      "operation": "DONE",
+      "target": null,
+      "latency_ms": 1675.52,
+      "usage": {
+        "prompt_tokens": 550,
+        "cached_tokens": 198,
+        "completion_tokens": 1
+      },
+      "cache_hit": true,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1
+    }
+  ],
+  "actions": [
+    {
+      "action": "Workspace name",
+      "kind": "fill",
+      "text": "Orchard",
+      "latency_ms": 2439.34,
+      "executed_ms": 4219,
+      "text_latency_ms": 1227
+    },
+    {
+      "action": "Timezone \u2192 Asia/Singapore",
+      "kind": "select",
+      "text": null,
+      "latency_ms": 1525.81,
+      "executed_ms": 6111,
+      "text_latency_ms": 0
+    },
+    {
+      "action": "Weekly digest",
+      "kind": "click",
+      "text": null,
+      "latency_ms": 1519.99,
+      "executed_ms": 7840,
+      "text_latency_ms": 0
+    },
+    {
+      "action": "Save preferences",
+      "kind": "click",
+      "text": null,
+      "latency_ms": 1655.8,
+      "executed_ms": 9706,
+      "text_latency_ms": 0
+    }
+  ],
+  "video": {
+    "speed": 2,
+    "cuts": 0,
+    "final_hold_seconds": 1,
+    "includes": "Initial page setup, all task time, verification, and a final hold; no cuts",
+    "original_file": null,
+    "raw_seconds": 14.36,
+    "mp4_seconds": 7.24,
+    "raw_sha256": "9c34d39bab3833f340f4fcd7cb2237dc568e730e1f66e48c5f947f7ca5ccd2ee",
+    "mp4_sha256": "3f97002bae7ae712fb65d09e03b551e3cdf68947aede15b03efb986e39532349"
+  }
+}

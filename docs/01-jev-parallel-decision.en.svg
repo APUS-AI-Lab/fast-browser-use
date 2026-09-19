@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Constrained Decision Architecture: KV-Cache Broadcast &amp; Parallel Single-Step Decisions</title>
+  <desc id="desc">How constrained System 1 models bypass token-by-token autoregression: context prefill, KV-Cache broadcasting, batched suffix forward pass, logit slicing, and deterministic JSON assembly for zero-hallucination execution.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#64748b" stroke-width="2"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill:#182b40; }
+      .eyebrow { font-size:15px; font-weight:600; letter-spacing:1.5px; fill:#486680; }
+      .title { font-size:32px; font-weight:700; }
+      .sub { font-size:20px; fill:#51667b; }
+      .heading { font-size:22px; font-weight:600; }
+      .body { font-size:18px; }
+      .small { font-size:16px; fill:#51667b; }
+      .arrow { fill:none; stroke="#64748b"; stroke-width:2.5; marker-end:url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1200" height="760" rx="24" fill="#f4f7fb"/>
+
+  <g transform="translate(0 -170)">
+
+  <!-- Step 1: Context & Schema -->
+  <rect x="52" y="190" width="510" height="88" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="226" class="heading">1. Input Context &amp; Schema</text>
+  <text x="76" y="256" class="small">Structured page context &amp; bounded decision candidate space</text>
+
+  <!-- Step 3: Suffix Batch -->
+  <rect x="638" y="190" width="510" height="88" rx="14" fill="#edf2f8" stroke="#c3d7f5"/>
+  <text x="662" y="226" class="heading">3. Precompiled Suffix Batch</text>
+  <text x="662" y="256" class="small">Pre-built prompt suffixes for M fields (e.g. ' "field_i": ')</text>
+
+  <!-- Arrow Step 1 -> Step 2 -->
+  <path d="M307 278 V310" class="arrow"/>
+
+  <!-- Step 2: Prefill Context -->
+  <rect x="52" y="316" width="510" height="88" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="352" class="heading">2. Single Context Prefill</text>
+  <text x="76" y="382" class="small">Single forward pass on base context to generate initial KV-Cache</text>
+
+  <!-- Arrow Step 2 -> Step 4 -->
+  <path d="M307 404 V436" class="arrow"/>
+
+  <!-- Step 4: KV-Cache Broadcast -->
+  <rect x="52" y="442" width="510" height="88" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="478" class="heading">4. KV-Cache Broadcast</text>
+  <text x="76" y="508" class="small">Broadcasts base KV-Cache across batch dimension (M parallel copies)</text>
+
+  <!-- Connectors into Step 5 -->
+  <path d="M307 530 V562" class="arrow"/>
+  <path d="M893 278 V562" class="arrow"/>
+
+  <!-- Step 5: Batched Forward Pass -->
+  <rect x="52" y="568" width="1096" height="96" rx="16" fill="#f3fbf8" stroke="#b8ded3"/>
+  <text x="80" y="606" class="heading">5. Single Batched Forward Pass</text>
+  <text x="80" y="638" class="body">M fields compute next-token logits concurrently: complexity drops from O(M × seq_len) to O(1)</text>
+
+  <!-- Arrow Step 5 -> Step 6 -->
+  <path d="M314.5 664 V696" class="arrow"/>
+
+  <!-- Step 6: Logit Slicing -->
+  <rect x="52" y="702" width="525" height="92" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="76" y="738" class="heading">6. Sub-Vocabulary Logit Slicing</text>
+  <text x="76" y="768" class="small">Masks 248,000+ irrelevant tokens; preserves only bounded choices</text>
+
+  <!-- Arrow Step 6 -> Step 7 -->
+  <path d="M577 748 H615" class="arrow"/>
+
+  <!-- Step 7: Softmax Scoring -->
+  <rect x="623" y="702" width="525" height="92" rx="14" fill="#fff" stroke="#d4deea"/>
+  <text x="647" y="738" class="heading">7. Normalized Softmax Scoring</text>
+  <text x="647" y="768" class="small">Computes relative candidate scores; selects optimal discrete choice</text>
+
+  <!-- Arrow Step 7 -> Step 8 -->
+  <path d="M885.5 794 V824" class="arrow"/>
+
+  <!-- Step 8: Deterministic JSON Assembly -->
+  <rect x="52" y="830" width="1096" height="74" rx="14" fill="#182f47"/>
+  <text x="600" y="863" text-anchor="middle" style="fill:#fff;font-size:21px;font-weight:600">8. Deterministic Host JSON Assembly</text>
+  <text x="600" y="889" text-anchor="middle" style="fill:#d2e1ef;font-size:16px">Host environment code populates schema with model choices: 100% syntactically valid, zero schema hallucinations</text>
+
+  </g>
+</svg>

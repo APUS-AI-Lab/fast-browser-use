@@ -1,0 +1,24 @@
+[
+  {
+    "name": "workspace-settings",
+    "url": "{base_url}/benchmarks/pages/settings.html",
+    "goal": "Save workspace preferences with workspace name Orchard, timezone Asia/Singapore, and weekly digest enabled.",
+    "expected": {
+      "title": "Preferences saved",
+      "text": [
+        "Saved workspace: Orchard.",
+        "Timezone: Asia/Singapore.",
+        "Weekly digest: enabled."
+      ]
+    }
+  },
+  {
+    "name": "research-navigation",
+    "url": "{base_url}/fast_browser_use/static/fixture.html?scenario=research",
+    "goal": "Open the article about using finite choices to control browser agents.",
+    "expected": {
+      "title": "A browser is a choice, not a conversation \u00b7 Forma",
+      "url": "{base_url}/fast_browser_use/static/fixture.html?scenario=research#choices"
+    }
+  }
+]

@@ -1,0 +1,71 @@
+# Virtual environment & dependencies
+.venv/
+env/
+venv/
+ENV/
+
+# Secrets & Environment variables
+.env
+.env.*
+.env.local
+!.env.example
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Build & packaging
+dist/
+build/
+*.egg-info/
+
+# Local research, logs, intermediate artifacts & local models (DO NOT PUBLISH)
+artifacts/
+models/
+*.log
+*.safetensors
+*.gguf
+
+# Local agent instructions and workspace settings
+AGENTS.md
+CLAUDE.md
+.codex/
+.claude/
+.agents/
+
+# Generated documentation assets: publish only the reviewed release evidence
+/docs/*.json
+/docs/*.png
+/docs/*.gif
+/docs/*.mp4
+/docs/*.webm
+!/docs/generality.json
+!/docs/measurement.json
+!/docs/model-sources.json
+!/docs/workspace-demo-measurement.json
+!/docs/demo.gif
+!/docs/demo.mp4
+!/docs/workspace-demo.mp4
+
+# OS generated files
+.DS_Store
+*/.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# IDE & editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Browser & testing reports
+test-results/
+playwright-report/
+.coverage
+htmlcov/

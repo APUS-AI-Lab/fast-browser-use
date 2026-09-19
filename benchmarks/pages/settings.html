@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Workspace preferences</title>
+<style>body{max-width:650px;margin:60px auto;font:20px system-ui;color:#182820}label{display:block;margin:24px 0}input,select,button{font:inherit;padding:10px}button{cursor:pointer}output{display:block;margin-top:25px}</style>
+<h1>Workspace preferences</h1><p>Configure a local workspace. Changes apply only after saving.</p>
+<form id="preferences">
+<label>Workspace name <input name="workspace" autocomplete="off"></label>
+<label>Timezone <select name="timezone"><option>UTC</option><option>Asia/Singapore</option><option>Europe/Paris</option></select></label>
+<label><input type="checkbox" name="digest"> Weekly digest</label>
+<button>Save preferences</button>
+</form><output id="confirmation" aria-live="polite"></output>
+<script>
+document.querySelector('form').addEventListener('submit',event=>{
+  event.preventDefault();
+  const data=new FormData(event.currentTarget);
+  document.querySelector('output').textContent=`Saved workspace: ${data.get('workspace')}. Timezone: ${data.get('timezone')}. Weekly digest: ${data.has('digest')?'enabled':'disabled'}.`;
+  document.title='Preferences saved';
+});
+</script></html>

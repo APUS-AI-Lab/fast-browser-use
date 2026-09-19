@@ -1,0 +1,14 @@
+[
+  {
+    "name": "python-about",
+    "url": "https://www.python.org/",
+    "goal": "Open the About Python page.",
+    "expected": {"url": "https://www.python.org/about/"}
+  },
+  {
+    "name": "example-domain-information",
+    "url": "https://example.com/",
+    "goal": "Open the link to learn more about this example domain.",
+    "expected": {"url": "https://www.iana.org/help/example-domains"}
+  }
+]

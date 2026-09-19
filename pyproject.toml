@@ -1,0 +1,34 @@
+[project]
+name = "fast-browser-use"
+version = "0.1.0"
+description = "An improved, ultra-fast browser-use skill powered by local Qwen3.5-9B inference."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+  "mlx-lm>=0.31.3,<0.32; sys_platform == 'darwin' and platform_machine == 'arm64'",
+  "playwright>=1.58,<2",
+  "huggingface-hub>=1.0,<2",
+]
+
+[project.optional-dependencies]
+modelscope = ["modelscope>=1.30,<2", "requests>=2.32", "tqdm>=4.67"]
+
+[project.scripts]
+fbu = "fast_browser_use.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pytest>=8.4,<9", "ruff>=0.14,<1", "pillow>=11,<13"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

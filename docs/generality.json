@@ -1,0 +1,139 @@
+{
+  "model": "mlx-community/Qwen3.5-9B-4bit",
+  "configuration": {
+    "planning": false,
+    "decision_mode": "auto",
+    "settle_ms": 150
+  },
+  "runtime": {
+    "mlx": "0.32.2",
+    "mlx-lm": "0.31.3",
+    "playwright": "1.63.0"
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "scope": "Selected release demonstrations, one trial each; not a general-web benchmark or success-rate estimate. All results of the current local/public manifests are included.",
+  "source_hashes": {
+    "verification.py": "2391a44ea3e4dd405424b48c63760598b5dece5b9daf56543d34c584fd24ff72",
+    "recording.py": "f4f79cb6ceb651d51f66f831b3207e185c3c38ea8879a2cc19fb4f9b5c39a846",
+    "questions.py": "828ff445ff4df0a46f2c93a59b2c037b19a7b343cfe631ccd397c9534604ba18",
+    "actions.py": "ac8b4da4897a14759adde948a3386a07b02a9d343955b2c46b0e1fc6e57ad23d",
+    "__init__.py": "ea3b8bd372e5f741f6c635fded6173833ce66e4eb97973b92b0b2dde5d512f98",
+    "model.py": "bb05c8ab95d35e07cee171373d15d4fc1e987bbea286fe53eaac3ddb6eb53836",
+    "browser.py": "dbc8003f080cfcbb6047f56d7fd648083e07d809c3a929045a4164f725f703f8",
+    "cli.py": "c0826858791bfb7515b04eb2c0998b2b505aea997d47eb42e6ebf03141cf61a0",
+    "snapshot.js": "f5510ca38f74460ce3c90cf3bd87781ef5c3fd199d166b3d3701b039fff85a7c",
+    "agent.py": "52f8305e34c072c71d8da0fae9545b4abecb7e2f3a9b95e38fc93a9e84394dfe",
+    "text_backend.py": "fae14a14bc85266827a55ef9fa30a3ca763486bf53c1691d4b57e5efb3a9a217",
+    "demo.py": "39e304d217997ecd9e9253d1a50bad12d51840a3bc1795987b6aa1a6b9c5b86c",
+    "static/index.html": "6bd21046609ed96a17cfc9df6a3fd72cf2e2358c7d47831b6701242f5545a8b7",
+    "static/style.css": "50c71eac30836a19f97977018dcaaaede757aab1197bc5ec4e0dfcf159518a38",
+    "static/app.js": "512b481d6a5cd362dafb495a0f9d4d454fb3591a08cbd982b1d29dd569741fa0",
+    "static/fixture.html": "011b3d73d62e681a9b56df986ebebccd2ab68e9636cc1c08756dea0ace77a612"
+  },
+  "runs": [
+    {
+      "task": "workspace-settings",
+      "trial": 1,
+      "task_ms": 12002,
+      "status": "done",
+      "actions": 4,
+      "passed": true,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "title": true,
+          "text_1": true,
+          "text_2": true,
+          "text_3": true
+        },
+        "expected": {
+          "url": null,
+          "title": "Preferences saved",
+          "text": [
+            "Saved workspace: Orchard.",
+            "Timezone: Asia/Singapore.",
+            "Weekly digest: enabled."
+          ]
+        },
+        "observed": {
+          "url": "http://127.0.0.1:64709/benchmarks/pages/settings.html",
+          "title": "Preferences saved"
+        }
+      },
+      "error": null
+    },
+    {
+      "task": "research-navigation",
+      "trial": 1,
+      "task_ms": 5430,
+      "status": "done",
+      "actions": 1,
+      "passed": true,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "url": true,
+          "title": true
+        },
+        "expected": {
+          "url": "http://127.0.0.1:64709/fast_browser_use/static/fixture.html?scenario=research#choices",
+          "title": "A browser is a choice, not a conversation \u00b7 Forma",
+          "text": []
+        },
+        "observed": {
+          "url": "http://127.0.0.1:64709/fast_browser_use/static/fixture.html?scenario=research#choices",
+          "title": "A browser is a choice, not a conversation \u00b7 Forma"
+        }
+      },
+      "error": null
+    },
+    {
+      "task": "python-about",
+      "trial": 1,
+      "task_ms": 8095,
+      "status": "done",
+      "actions": 1,
+      "passed": true,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "url": true
+        },
+        "expected": {
+          "url": "https://www.python.org/about/",
+          "title": null,
+          "text": []
+        },
+        "observed": {
+          "url": "https://www.python.org/about/",
+          "title": "About Python\u2122 | Python.org"
+        }
+      },
+      "error": null
+    },
+    {
+      "task": "example-domain-information",
+      "trial": 1,
+      "task_ms": 7309,
+      "status": "done",
+      "actions": 1,
+      "passed": true,
+      "verification": {
+        "passed": true,
+        "checks": {
+          "url": true
+        },
+        "expected": {
+          "url": "https://www.iana.org/help/example-domains",
+          "title": null,
+          "text": []
+        },
+        "observed": {
+          "url": "https://www.iana.org/help/example-domains",
+          "title": "Example Domains"
+        }
+      },
+      "error": null
+    }
+  ]
+}

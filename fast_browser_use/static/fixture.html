@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forma · Reading room</title>
+<style>
+  *{box-sizing:border-box}body{margin:0;background:#f6f7ef;color:#263221;font:16px/1.65 system-ui,sans-serif}
+  header{display:flex;align-items:center;justify-content:space-between;padding:22px 48px;border-bottom:1px solid #dce1d2}
+  a{color:inherit}.logo{font-size:26px;font-weight:750;text-decoration:none}
+  main{max-width:1080px;margin:auto;padding:42px 48px}h1{font-size:42px;line-height:1.15;margin:12px 0 20px}
+  .edition,.article-tag{font-size:11px;letter-spacing:1.3px;color:#6b775f}
+  p{color:#5a6752}.articles{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:32px}
+  .article{border-top:2px solid #8da078;padding-top:18px}.article a{display:block;font-size:23px;line-height:1.3;margin:12px 0}
+  .article p{font-size:15px}.article-content{max-width:690px}.article-content p{font-size:17px}
+  .back{font:inherit;color:inherit;background:none;border:1px solid #b9c2ad;padding:8px 14px;cursor:pointer;margin-bottom:22px}
+  footer{font-size:11px;color:#78866b;border-top:1px solid #dce1d2;padding-top:22px;margin-top:32px}
+</style>
+</head>
+<body>
+<header><a href="#reading" class="logo" id="home">forma.</a><span class="edition">READING ROOM</span></header>
+<main id="content"></main>
+<script>
+      const root = document.getElementById("content");
+      const articles = [
+        {
+          id: "choices",
+          tag: "AGENTS · 6 MIN",
+          title: "A browser is a choice, not a conversation",
+          description:
+            "How finite action sets turn visible elements into a fast browser control loop.",
+        },
+        {
+          id: "latency",
+          tag: "SYSTEMS · 4 MIN",
+          title: "Where the milliseconds go",
+          description:
+            "Measuring network latency, model decisions, and page settling separately.",
+        },
+        {
+          id: "uncertainty",
+          tag: "RESEARCH · 5 MIN",
+          title: "Confidence is not correctness",
+          description:
+            "What a peaked distribution can and cannot tell you about an outcome.",
+        },
+      ];
+      function research() {
+        document.title = "Forma · Reading room";
+        root.innerHTML =
+          '<div class="edition">NOTES FROM THE LAB</div><h1>Ideas worth opening.</h1><p>Small experiments in how software sees and acts.</p><div class="articles">' +
+          articles
+            .map(
+              (a) =>
+                `<article class="article"><div class="article-tag">${a.tag}</div><a href="#${a.id}" data-article="${a.id}">${a.title}</a><p>${a.description}</p></article>`,
+            )
+            .join("") +
+          "</div><footer>Local reading fixture · Three original demo articles</footer>";
+        root
+          .querySelectorAll("[data-article]")
+          .forEach((a) => (a.onclick = () => article(a.dataset.article)));
+      }
+      function article(id) {
+        const a = articles.find((a) => a.id === id);
+        document.title = a.title + " · Forma";
+        root.innerHTML = `<button type="button" class="back" id="back">← Reading room</button><div class="article-content"><div class="edition">${a.tag}</div><h1>${a.title}</h1><p>${a.description}</p>${id === "choices" ? "<p>Observe the browser’s accessibility tree. Enumerate the actions that are actually available. Ask a choice model for the next action, execute it, then observe again.</p><p>Links, buttons, checkboxes, and dropdown values already form a finite vocabulary. Text fields need a separate value generator. The model chooses the field; a small language model supplies the words.</p><p>Freshness is part of correctness. Bind every decision to its observed page state. If the page changes before execution, discard the decision and observe again.</p>" : "<p>Measure the complete loop against an observable result. A valid action and a confident decision do not by themselves prove that the task succeeded.</p>"}</div><footer>End of article · Local demo content</footer>`;
+        document.getElementById("back").onclick = research;
+      }
+      document.getElementById("home").onclick = research;
+      research();
+</script>
+</body>
+</html>

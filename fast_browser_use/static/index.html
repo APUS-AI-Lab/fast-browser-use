@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="demo-token" content="__TOKEN__" />
+    <title>Fast Browser Use · Local Qwen3.5-9B</title>
+    
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <a href="/" aria-label="Homepage" class="brand"
+        >fast<span>browser</span> <i>/</i> local</a
+      >
+      <div class="local"><span class="dot"></span> Qwen3.5-9B · On device</div>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">A BROWSER THAT CHOOSES</p>
+          <h1>Your browser.<br>Your model. Your machine.</h1>
+          <p>
+            Qwen3.5-9B chooses the next action and writes the words. Every inference runs on your Mac.
+            <a href="/demo.mp4" target="_blank" rel="noopener">Watch the demo · 4× playback ↗</a>
+          </p>
+        </div>
+        <div class="model-tag">Qwen3.5-9B-4bit <span>MLX · 4-bit</span></div>
+      </section>
+      <form id="task-form">
+        <div class="task-label">
+          <label for="goal">Give it a task</label
+          ><select id="scenario" name="scenario" aria-label="Demo scenario">
+            
+            <option value="research">Reading room · fixture</option><option value="flights">Google Flights · real web</option><option value="custom">Custom website</option>
+          </select>
+        </div>
+        <input id="custom-url" type="url" placeholder="https://example.com" aria-label="Website URL" hidden><div class="task-row">
+          <textarea id="goal" name="goal" rows="3">
+Open the article about using finite choices to control browser agents.</textarea
+          ><button type="submit" id="start" class="primary">
+            Start demo <span>↗</span>
+          </button>
+        </div>
+      </form>
+      <div class="toolbar">
+        <div class="status">
+          <span class="dot" id="status-dot"></span
+          ><span id="status" role="status">Ready to explore</span>
+        </div>
+        <div class="controls"><label class="overlay-control"><input name="pace" id="pace" type="checkbox"> Step preview</label>
+          <label class="overlay-control"
+            ><input name="overlays" id="overlays" type="checkbox" checked />
+            Targets</label
+          ><button type="button" id="choose" disabled>Choose next</button
+          ><button type="button" id="execute" disabled>Execute choice</button
+          ><button type="button" id="auto" disabled>Run automatically</button
+          ><button type="button" id="stop" hidden>Pause</button>
+        </div>
+      </div>
+      <div id="error" role="alert" hidden></div>
+      <section class="workspace">
+        <div class="browser-panel">
+          <div class="browser-bar">
+            <div class="traffic"><b></b><b></b><b></b></div>
+            <span id="url">Local demo browser</span
+            ><span class="live">LIVE</span>
+          </div>
+          <div class="viewport" id="viewport">
+            <div class="empty" id="empty">
+              <p class="empty-symbol">[ ↗ ]</p>
+              <h2>Watch the decision happen.</h2>
+              <p>
+                Start a task to see a real browser, its available<br />actions,
+                and the model's choice.
+              </p>
+            </div>
+            <img
+              id="screenshot"
+              alt="Live screenshot of the controlled browser"
+              hidden
+            />
+            <div id="targets"></div>
+          </div>
+          <div class="browser-footer">
+            <span id="page-title">Isolated demo tab</span
+            ><span>Visible DOM → local Qwen3.5-9B → Chromium</span>
+          </div>
+        </div>
+        <aside>
+          <div class="aside-header">
+            <div>
+              <p class="eyebrow">NEXT ACTION</p>
+              <h2 id="choice-title">Waiting for a page</h2>
+            </div>
+            <span id="action-count">0 options</span>
+          </div>
+          <div id="plan" class="plan"></div>
+          <div class="metrics">
+            <div><span>Decision time</span><strong id="latency">—</strong></div>
+            <div>
+              <span>Target score</span><strong id="confidence">—</strong>
+            </div>
+            <div>
+              <span>Operation</span
+              ><strong id="completion">—</strong>
+            </div>
+          </div>
+          <div id="operation-choices" class="operation-choices"></div>
+          <p class="distribution-label">
+            Indexed elements
+            <span id="ranking-note">Choose next to rank</span>
+          </p>
+          <div id="choices" class="choices">
+            <p class="muted">Available actions will appear here.</p>
+          </div>
+          <p class="aside-note">
+            One token selects a complete legal action.<br />Scores are relative preferences, not correctness guarantees.
+          </p>
+        </aside>
+      </section>
+      <section class="trace">
+        <div class="trace-heading">
+          <h2>Decision trail <span id="step-count">0 actions</span></h2>
+          <button type="button" id="download" disabled>Export trace ↓</button>
+        </div>
+        <div id="history">
+          <p class="muted">Each executed action leaves an observed result.</p>
+        </div>
+      </section>
+      <details>
+        <summary>What the model sees</summary>
+        <pre id="model-state">
+Start a demo to inspect its structured state.</pre>
+      </details>
+      <footer>
+        <span>Fast Browser Use · Inspired by Jev Ultrafast</span
+        ><span id="helper">Local model loading</span>
+      </footer>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
