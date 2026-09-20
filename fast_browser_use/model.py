@@ -17,6 +17,22 @@ DEFAULT_REVISION = "8b2b98c00a6b4d291155e4890773ca8f769aee53"
 MODELSCOPE_REVISION = "27ab860cfc825df921f0ac1453133f3fa963a7f2"
 TORCH_MODEL = "Qwen/Qwen3.5-9B"
 TORCH_REVISION = "c202236235762e1c871ad0ccb60c8ee5ba337b9a"
+TORCH_35B_MODEL = "Qwen/Qwen3.5-35B-A3B"
+TORCH_35B_REVISION = "59d61f3ce65a6d9863b86d2e96597125219dc754"
+MLX_PREFILL_STEP_SIZE = 2048  # Match MLX-LM's bounded prompt batches, including MoE models.
+
+TORCH_MODELS = {
+    "9b": (TORCH_MODEL, TORCH_REVISION),
+    "qwen-9b": (TORCH_MODEL, TORCH_REVISION),
+    "qwen3.5-9b": (TORCH_MODEL, TORCH_REVISION),
+    TORCH_MODEL.lower(): (TORCH_MODEL, TORCH_REVISION),
+    "35b": (TORCH_35B_MODEL, TORCH_35B_REVISION),
+    "qwen-35b": (TORCH_35B_MODEL, TORCH_35B_REVISION),
+    "35b-a3b": (TORCH_35B_MODEL, TORCH_35B_REVISION),
+    "qwen-35b-a3b": (TORCH_35B_MODEL, TORCH_35B_REVISION),
+    "qwen3.5-35b-a3b": (TORCH_35B_MODEL, TORCH_35B_REVISION),
+    TORCH_35B_MODEL.lower(): (TORCH_35B_MODEL, TORCH_35B_REVISION),
+}
 
 
 def resolve_backend(backend=None):
@@ -28,22 +44,43 @@ def resolve_backend(backend=None):
     return backend
 
 
-def model_source(backend):
-    return (DEFAULT_MODEL, DEFAULT_REVISION) if backend == "mlx" else (TORCH_MODEL, TORCH_REVISION)
+def model_source(backend, model=None):
+    if backend == "mlx":
+        return DEFAULT_MODEL, DEFAULT_REVISION
+    target = (model or os.environ.get("FBU_MODEL") or TORCH_MODEL).strip()
+    resolved = TORCH_MODELS.get(target.lower())
+    if resolved:
+        return resolved
+    if os.path.isdir(target):
+        return target, None
+    raise ValueError(
+        f"FBU_MODEL for torch must be {TORCH_MODEL}, {TORCH_35B_MODEL} or a local compatible model directory"
+    )
 
 
 def model_location(path, backend):
     from huggingface_hub import snapshot_download
 
-    default, revision = model_source(backend)
-    name = str(path or os.environ.get("FBU_MODEL") or default)
-    revision = os.environ.get("FBU_MODEL_REVISION") or (revision if name == default else None)
-    if os.path.isdir(name):
+    name = str(path or os.environ.get("FBU_MODEL") or "").strip()
+    if backend == "mlx":
+        default, default_revision = DEFAULT_MODEL, DEFAULT_REVISION
+        name = name or default
+        revision = os.environ.get("FBU_MODEL_REVISION") or (default_revision if name == default else None)
+        if os.path.isdir(name):
+            return name, revision, name
+        if name != default:
+            raise ValueError(f"FBU_MODEL for {backend} must be {default} or a local compatible model directory")
+        location = snapshot_download(name, revision=revision, allow_patterns=["*.json", "*.jinja", "*.safetensors"])
+        return name, revision, str(location)
+
+    if name and os.path.isdir(name):
+        revision = os.environ.get("FBU_MODEL_REVISION")
         return name, revision, name
-    if name != default:
-        raise ValueError(f"FBU_MODEL for {backend} must be {default} or a local compatible Qwen3.5-9B directory")
-    location = snapshot_download(name, revision=revision, allow_patterns=["*.json", "*.jinja", "*.safetensors"])
-    return name, revision, str(location)
+
+    repo, pinned_revision = model_source("torch", name)
+    revision = os.environ.get("FBU_MODEL_REVISION") or pinned_revision
+    location = snapshot_download(repo, revision=revision, allow_patterns=["*.json", "*.jinja", "*.safetensors"])
+    return repo, revision, str(location)
 
 
 POLICY = """Choose the next browser action for the CURRENT SUBGOAL.
@@ -180,15 +217,18 @@ class LocalModel:
         )
 
     def _prefill(self, tokens, cache):
-        for start in range(0, len(tokens), 512):
-            self.model(self.mx.array([tokens[start : start + 512]]), cache=cache)
+        for start in range(0, len(tokens), MLX_PREFILL_STEP_SIZE):
+            self.model(self.mx.array([tokens[start : start + MLX_PREFILL_STEP_SIZE]]), cache=cache)
             self.mx.eval([c.state for c in cache])
 
     def score(self, content, count, *, purpose="action", continuation="", thinking=False):
+        from mlx_lm.generate import wired_limit
         from mlx_lm.models.cache import make_prompt_cache
 
-        with self.lock:
-            started = time.perf_counter()
+        started = time.perf_counter()
+        # Use the same temporary residency policy as MLX-LM generation. Restore
+        # it on success or failure; never change the machine's system limits.
+        with self.lock, wired_limit(self.model):
             prompt = self.template(content, thinking=thinking) + continuation
             tokens = self.tokenizer.encode(prompt, add_special_tokens=False)
             # Cache only the invariant policy + goal, before the observed PAGE section.
@@ -207,17 +247,19 @@ class LocalModel:
             logits = self.model(self.mx.array([remaining[-1:]]), cache=cache)[0, -1]
             probabilities = self.mx.softmax(logits[self.mx.array(self.label_ids[:count])].astype(self.mx.float32))
             self.mx.eval(probabilities)
-            return probabilities.tolist(), {
-                "model": self.name,
-                "latency_ms": round((time.perf_counter() - started) * 1000, 2),
-                "usage": {
-                    "prompt_tokens": len(tokens),
-                    "cached_tokens": len(prefix) if hit else 0,
-                    "completion_tokens": 1,
-                },
-                "cache_hit": hit,
-                "candidate_count": count,
-            }
+            scores = probabilities.tolist()
+        return scores, {
+            "model": self.name,
+            "latency_ms": round((time.perf_counter() - started) * 1000, 2),
+            "usage": {
+                "prompt_tokens": len(tokens),
+                "cached_tokens": len(prefix) if hit else 0,
+                "completion_tokens": 1,
+            },
+            "cache_hit": hit,
+            "candidate_count": count,
+            "prefill_step_size": MLX_PREFILL_STEP_SIZE,
+        }
 
     def _stream(self, prompt, max_tokens):
         from mlx_lm import stream_generate

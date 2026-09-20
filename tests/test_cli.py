@@ -188,3 +188,29 @@ def test_incompatible_torch_download_source_fails_before_downloading(monkeypatch
     monkeypatch.setattr(sys, "argv", ["fbu", "download", "--backend", "torch", "--source", source])
     with pytest.raises(SystemExit):
         cli.main()
+
+
+@pytest.mark.parametrize("model_arg,expected_model,expected_rev", [
+    ("35b", "Qwen/Qwen3.5-35B-A3B", "59d61f3ce65a6d9863b86d2e96597125219dc754"),
+    ("35b-a3b", "Qwen/Qwen3.5-35B-A3B", "59d61f3ce65a6d9863b86d2e96597125219dc754"),
+    ("Qwen/Qwen3.5-35B-A3B", "Qwen/Qwen3.5-35B-A3B", "59d61f3ce65a6d9863b86d2e96597125219dc754"),
+    ("9b", "Qwen/Qwen3.5-9B", "c202236235762e1c871ad0ccb60c8ee5ba337b9a"),
+])
+def test_torch_download_supports_selectable_models(monkeypatch, model_arg, expected_model, expected_rev):
+    download = Mock(return_value="/cached/qwen")
+    monkeypatch.setitem(sys.modules, "huggingface_hub", SimpleNamespace(snapshot_download=download))
+    monkeypatch.setattr(cli, "load_environment", lambda: None)
+    monkeypatch.setattr(sys, "argv", ["fbu", "download", "--backend", "torch", "--model", model_arg])
+    cli.main()
+    download.assert_called_once_with(
+        expected_model, revision=expected_rev, local_dir=None,
+        allow_patterns=["*.json", "*.jinja", "*.safetensors"],
+    )
+
+
+def test_torch_download_rejects_unsupported_model(monkeypatch):
+    monkeypatch.setattr(cli, "load_environment", lambda: None)
+    monkeypatch.setattr(sys, "argv", ["fbu", "download", "--backend", "torch", "--model", "unsupported-model"])
+    with pytest.raises(SystemExit):
+        cli.main()
+

@@ -204,6 +204,7 @@ evidence["browser_headless"] = trace.get("browser_headless")
 evidence["decisions"] = [
     {k: d.get(k) for k in (
         "operation", "target", "latency_ms", "usage", "cache_hit", "completion_check", "reasoning", "scoring_passes",
+        "prefill_step_size",
     )}
     for d in trace["decisions"]
 ]

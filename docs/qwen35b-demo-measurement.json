@@ -1,0 +1,241 @@
+{
+  "goal": "Find and open the Wikipedia article about Python, the programming language.",
+  "elapsed_ms": 18902,
+  "verification": {
+    "passed": true,
+    "checks": {
+      "article_url": true,
+      "article_title": true
+    }
+  },
+  "source_hashes": {
+    "verification.py": "2391a44ea3e4dd405424b48c63760598b5dece5b9daf56543d34c584fd24ff72",
+    "recording.py": "ed07dd0b81625542de316619b203cd424d3a9ff58dfdd34f7919f7c610ae8907",
+    "torch_backend.py": "968658b5ca0f580c0a8407cd73dd881df731a90b368612ae1d588b35ee3698e7",
+    "questions.py": "828ff445ff4df0a46f2c93a59b2c037b19a7b343cfe631ccd397c9534604ba18",
+    "actions.py": "ac8b4da4897a14759adde948a3386a07b02a9d343955b2c46b0e1fc6e57ad23d",
+    "__init__.py": "ea3b8bd372e5f741f6c635fded6173833ce66e4eb97973b92b0b2dde5d512f98",
+    "model.py": "000e9fa1f51e47db42b687ecd20b73ad5a5348449cbe3e079c82857646081f1c",
+    "browser.py": "deb466b0e8de36051122f52f9d1f11dedf512a1826334952982a075c32ad74b3",
+    "cli.py": "1a7d6e3d5be328acbac5a6794a30732b355f9983207906b65269e80ecddf941e",
+    "snapshot.js": "f5510ca38f74460ce3c90cf3bd87781ef5c3fd199d166b3d3701b039fff85a7c",
+    "agent.py": "2a9f5ac0ea9764b2705026b02c3688c88b78b8ab8aedfeb9e71ccc8bf98a39a4",
+    "text_backend.py": "a214e44fa81ff0463bf9656eafee81a654c713c11eab1a272d859e84a012e532",
+    "demo.py": "39e304d217997ecd9e9253d1a50bad12d51840a3bc1795987b6aa1a6b9c5b86c",
+    "static/index.html": "6bd21046609ed96a17cfc9df6a3fd72cf2e2358c7d47831b6701242f5545a8b7",
+    "static/style.css": "50c71eac30836a19f97977018dcaaaede757aab1197bc5ec4e0dfcf159518a38",
+    "static/app.js": "512b481d6a5cd362dafb495a0f9d4d454fb3591a08cbd982b1d29dd569741fa0",
+    "static/fixture.html": "011b3d73d62e681a9b56df986ebebccd2ab68e9636cc1c08756dea0ace77a612"
+  },
+  "model": "models/Qwen3.5-35B-A3B-4bit",
+  "model_revision": "c35ef17078b25552247b876b2b9cbfd1430bbfa9",
+  "runtime": {
+    "mlx": "0.32.2",
+    "mlx-lm": "0.31.3",
+    "torch": "2.14.0",
+    "accelerate": "1.15.0",
+    "transformers": "5.17.0",
+    "playwright": "1.63.0"
+  },
+  "hardware": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "chip": "Apple M2 Pro",
+    "memory_bytes": 34359738368
+  },
+  "model_load_ms": 6883,
+  "text_calls": [
+    {
+      "model": "models/Qwen3.5-35B-A3B-4bit",
+      "latency_ms": 937,
+      "usage": {
+        "prompt_tokens": 180,
+        "completion_tokens": 7
+      },
+      "field": "Search Wikipedia",
+      "value": "Python, the programming language"
+    }
+  ],
+  "timing_boundary": "Warm model, after initial navigation/observation; all planning, decisions, text, actions, waits.",
+  "error": null,
+  "scenario": "wikipedia",
+  "plan": [
+    "Find and open the Wikipedia article about Python, the programming language."
+  ],
+  "plan_calls": [],
+  "milestones": [
+    "Find and open the Wikipedia article about Python, the programming language."
+  ],
+  "summary": {
+    "task_ms": 18902,
+    "median_decision_ms": 3279.96,
+    "median_action_decision_ms": 2998.73,
+    "scoring_calls": 4,
+    "decisions": 4,
+    "rejected_decisions": 0,
+    "preparation_ms": 2043.51,
+    "actions": 3,
+    "text_calls": 1,
+    "plan_calls": 0,
+    "planning_ms": 0,
+    "reasoning_calls": 0,
+    "reasoning_ms": 0,
+    "verified": true,
+    "error": null
+  },
+  "request": null,
+  "final_page": {
+    "url": "https://en.wikipedia.org/wiki/Python_(programming_language)",
+    "title": "Python (programming language) - Wikipedia"
+  },
+  "recorded_at": "2026-09-20T03:26:56.282699+00:00",
+  "local_deliberation": false,
+  "configuration": {
+    "planning": false,
+    "decision_mode": "auto",
+    "settle_ms": 150
+  },
+  "inference": {
+    "backend": "mlx",
+    "device": "metal",
+    "dtype": "4-bit"
+  },
+  "rejections": [],
+  "observations": [
+    {
+      "latency_ms": 530.39,
+      "samples": 9,
+      "settled": true,
+      "elapsed_ms": 540
+    },
+    {
+      "latency_ms": 464.42,
+      "samples": 8,
+      "settled": true,
+      "elapsed_ms": 7295
+    },
+    {
+      "latency_ms": 524.4,
+      "samples": 9,
+      "settled": true,
+      "elapsed_ms": 11382
+    },
+    {
+      "latency_ms": 524.3,
+      "samples": 6,
+      "settled": true,
+      "elapsed_ms": 15304
+    }
+  ],
+  "browser_locale": "en-US",
+  "browser_headless": true,
+  "decisions": [
+    {
+      "operation": "TYPE_TEXT",
+      "target": "2",
+      "latency_ms": 5255.16,
+      "usage": {
+        "prompt_tokens": 1306,
+        "cached_tokens": 0,
+        "completion_tokens": 1
+      },
+      "cache_hit": false,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1,
+      "prefill_step_size": 2048
+    },
+    {
+      "operation": "CLICK",
+      "target": "3",
+      "latency_ms": 2749.12,
+      "usage": {
+        "prompt_tokens": 1362,
+        "cached_tokens": 186,
+        "completion_tokens": 1
+      },
+      "cache_hit": true,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1,
+      "prefill_step_size": 2048
+    },
+    {
+      "operation": "CLICK",
+      "target": "27",
+      "latency_ms": 2998.73,
+      "usage": {
+        "prompt_tokens": 1354,
+        "cached_tokens": 186,
+        "completion_tokens": 1
+      },
+      "cache_hit": true,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1,
+      "prefill_step_size": 2048
+    },
+    {
+      "operation": "DONE",
+      "target": null,
+      "latency_ms": 3561.19,
+      "usage": {
+        "prompt_tokens": 1777,
+        "cached_tokens": 186,
+        "completion_tokens": 1
+      },
+      "cache_hit": true,
+      "completion_check": null,
+      "reasoning": null,
+      "scoring_passes": 1,
+      "prefill_step_size": 2048
+    }
+  ],
+  "actions": [
+    {
+      "action": "Search Wikipedia",
+      "kind": "fill",
+      "text": "Python, the programming language",
+      "latency_ms": 5255.16,
+      "executed_ms": 6786,
+      "text_latency_ms": 937
+    },
+    {
+      "action": "Search for pages containing  Python, the programming language",
+      "kind": "click",
+      "text": null,
+      "latency_ms": 2749.12,
+      "executed_ms": 10054,
+      "text_latency_ms": 0
+    },
+    {
+      "action": "Python  ( programming   language )",
+      "kind": "click",
+      "text": null,
+      "latency_ms": 2998.73,
+      "executed_ms": 14391,
+      "text_latency_ms": 0
+    }
+  ],
+  "video": {
+    "speed": 3,
+    "cuts": 0,
+    "final_hold_seconds": 1,
+    "includes": "Initial page setup, all task time, verification, and a final hold; no cuts",
+    "original_file": "qwen35b-demo-original.webm",
+    "raw_seconds": 21.76,
+    "mp4_seconds": 7.32,
+    "raw_sha256": "d58e0dfad5411792decf66556d39f2655df3d2c22fc39583293283123d983768",
+    "mp4_sha256": "664492b09a848cf299181df1d419204cf3b588ae19419ed9c97cf135498f6404"
+  },
+  "benchmark_context": {
+    "model_lifecycle": "Fresh process and model for this task",
+    "first_inference_included": true,
+    "trial": 2,
+    "series_task_ms": [
+      19152,
+      18902,
+      18834
+    ]
+  }
+}

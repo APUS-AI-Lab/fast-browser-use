@@ -45,23 +45,37 @@ def torch_dtype(torch, device):
 def load_torch_model(location, device, dtype):
     config = json.loads((Path(location) / "config.json").read_text())
     text = config.get("text_config", config)
-    if (config.get("model_type") not in {"qwen3_5", "qwen3_5_text"}
-            or text.get("hidden_size") != 4096 or text.get("num_hidden_layers") != 32
-            or text.get("intermediate_size") != 12288):
-        raise ValueError("The PyTorch backend supports Qwen3.5-9B weights only")
+    dense_9b = (
+        config.get("model_type") in {"qwen3_5", "qwen3_5_text"}
+        and text.get("hidden_size") == 4096
+        and text.get("num_hidden_layers") == 32
+        and text.get("intermediate_size") == 12288
+    )
+    moe_35b = (
+        config.get("model_type") in {"qwen3_5_moe", "qwen3_5_moe_text"}
+        and text.get("hidden_size") == 2048
+        and text.get("num_hidden_layers") == 40
+        and text.get("moe_intermediate_size") == 512
+        and text.get("shared_expert_intermediate_size") == 512
+        and text.get("num_experts") == 256
+        and text.get("num_experts_per_tok") == 8
+    )
+    if not (dense_9b or moe_35b):
+        raise ValueError("The PyTorch backend supports Qwen3.5-9B and Qwen3.5-35B-A3B weights only")
     if config.get("quantization") or config.get("quantization_config"):
-        raise ValueError("PyTorch requires original Qwen3.5-9B weights, not MLX/quantized weights")
-    from transformers import AutoTokenizer, Qwen3_5ForCausalLM
+        raise ValueError("PyTorch requires original Qwen3.5 weights, not MLX/quantized weights")
+    import transformers
 
+    loader = getattr(transformers, "Qwen3_5MoeForCausalLM" if moe_35b else "Qwen3_5ForCausalLM")
     # Transformers extracts the text config and maps model.language_model.* keys.
     # Vision/MTP weights are unused; missing language weights must never be randomized.
-    model, info = Qwen3_5ForCausalLM.from_pretrained(
+    model, info = loader.from_pretrained(
         location, dtype=dtype, device_map={"": str(device)}, local_files_only=True,
         trust_remote_code=False, output_loading_info=True,
     )
     if info.get("missing_keys") or info.get("mismatched_keys") or info.get("error_msgs"):
-        raise ValueError("Incomplete or incompatible Qwen3.5-9B language weights")
-    tokenizer = AutoTokenizer.from_pretrained(location, local_files_only=True, trust_remote_code=False)
+        raise ValueError("Incomplete or incompatible Qwen3.5 language weights")
+    tokenizer = transformers.AutoTokenizer.from_pretrained(location, local_files_only=True, trust_remote_code=False)
     return model.eval(), tokenizer
 
 

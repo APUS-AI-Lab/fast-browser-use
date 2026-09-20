@@ -5,12 +5,12 @@
 # Fast Browser Use
 
 **An ultra-fast, local-first "System 1" browser automation engine & Agent Skill for Claude Code, Codex, and Cursor.**  
-*Powered by local Qwen3.5-9B via MLX or PyTorch (CUDA / CPU). Zero cloud inference, second-level reflexes, zero selector hallucinations.*
+*Powered by local Qwen3.5-9B / Qwen3.5-35B-A3B via MLX or PyTorch (CUDA / CPU). Zero cloud inference, second-level reflexes, zero selector hallucinations.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linux--windows--gpu-servers-pytorch)
-[![Model: Qwen3.5-9B-4bit](https://img.shields.io/badge/Model-Qwen3.5--9B--4bit-purple.svg)](https://huggingface.co/Qwen/Qwen3.5-9B)
+[![Model: Qwen3.5-9B | 35B-A3B](https://img.shields.io/badge/Model-Qwen3.5--9B%20%7C%2035B--A3B-purple.svg)](https://huggingface.co/Qwen)
 [![Cloud Inference: None](https://img.shields.io/badge/Cloud%20API-Zero%20(%20100%25%20Offline%20)-orange.svg)](#-local-first-architecture)
 [![Agent Skill: Claude Code & Codex](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%7C%20Codex-brightgreen.svg)](skills/fast-browser-use/SKILL.md)
 
@@ -21,13 +21,13 @@
 ---
 
 <div align="center">
-<a href="docs/demo.mp4"><img src="docs/demo.gif" alt="Local Qwen3.5 browser run, clearly labeled 4x playback" width="100%" /></a>
+<a href="docs/qwen35b-demo.mp4"><img src="docs/qwen35b-demo.gif" alt="Local Qwen3.5-35B-A3B browser run, clearly labeled 3x playback" width="100%" /></a>
 
-**[8.32s MP4 Preview (4× Playback)](docs/demo.mp4)** · **[Measurement Telemetry (JSON)](docs/measurement.json)** · **[Performance Benchmarks](docs/performance.md)**
+**[Recording preview (3× playback acceleration)](docs/qwen35b-demo.mp4)** · **[Measurement Telemetry (JSON)](docs/qwen35b-demo-measurement.json)** · **[Performance Benchmarks](docs/performance.md)**
 </div>
 
 > **Open-Source Reverse Engineering of Jev · Pure Local Browser-Use Agent Skill**  
-> Fast Browser Use reproduces Jev's System 1 discrete decision paradigm using open-source weights (Qwen3.5-9B), grounded in real-world browser automation. By mapping visible interactive elements to vocabulary tokens for single-step logits scoring, it structurally eliminates selector hallucinations—packaged as an out-of-the-box agent skill for 100% local, offline execution.
+> Fast Browser Use reproduces Jev's System 1 discrete decision paradigm using open-source weights (Qwen3.5-9B / Qwen3.5-35B-A3B), grounded in real-world browser automation. By mapping visible interactive elements to vocabulary tokens for single-step logits scoring, it structurally eliminates selector hallucinations—packaged as an out-of-the-box agent skill for 100% local, offline execution.
 
 ---
 
@@ -45,7 +45,7 @@ Currently, Jev is provided as a cloud API service without publicly available mod
 
 **Fast Browser Use** is an open-source reverse engineering and local reproduction of Jev's core decision mechanics, purpose-built for the demanding domain of **browser automation (`browser-use`)**.
 
-By analyzing Jev's documented interface paradigms and evaluation logic, as well as drawing inspiration from open-source projects, we decoupled bounded categorical decisions from slow autoregressive text generation and ported the architecture to run 100% locally on Apple Silicon using **Qwen3.5-9B**:
+By analyzing Jev's documented interface paradigms and evaluation logic, as well as drawing inspiration from open-source projects, we decoupled bounded categorical decisions from slow autoregressive text generation and ported the architecture to run 100% locally on Apple Silicon / GPU using **Qwen3.5-9B / Qwen3.5-35B-A3B**:
 
 - **From Code Generation to Bounded Categorical Choice**: Traditional browser agents ask an LLM to generate raw Playwright scripts or CSS selectors, frequently causing "selector hallucinations" on dynamic pages. Fast Browser Use scans the rendered DOM tree, extracts only visible, interactable elements, and formats them into discrete candidate tuples `(CLICK, btn_7)`. The model selects exclusively from objectively existing elements—eliminating selector hallucinations by design.
 - **Single-Token Logits Scoring ($O(1)$ Reflexes)**: Legal candidate actions are dynamically mapped to single discrete tokens in the vocabulary (`A`, `B`, `C`...). With a single forward pass, the engine evaluates normalized Softmax probabilities over candidate logits in **seconds (single forward pass)**, skipping the multi-second autoregressive text decoding loop entirely.
@@ -139,29 +139,30 @@ A fast model without rigorous guardrails is brittle. Fast Browser Use wraps loca
 All measurements below were collected on consumer-grade hardware with **100% local inference** (zero cloud API requests):
 - **Hardware**: Apple Silicon Mac (Apple M2 Pro, 32 GB unified memory, macOS)
 - **Inference Stack**: MLX 0.32.2 / MLX-LM 0.31.3
-- **Model Weights**: `Qwen3.5-9B MLX 4-bit` (~5.95 GB memory footprint)
+- **Evaluated Models**: `Qwen3.5-9B MLX 4-bit` & `Qwen3.5-35B-A3B MLX 4-bit`
 
 ### 1. Wikipedia End-to-End Live Navigation
 
 Task: *"Find and open the Wikipedia article about Python (programming language) starting from Main_Page, strictly verifying final URL and title."*
 
-| Run Trial | Execution Task Time |
-| :---: | :---: |
-| Trial 1 | 30.079 s |
-| Trial 2 | 30.440 s |
-| Trial 3 | 30.091 s |
-| **Median** | **30.091 s** |
+| Run Trial | Qwen3.5-9B Task Time | Qwen3.5-35B-A3B Task Time |
+| :---: | :---: | :---: |
+| Trial 1 | 30.079 s | 19.152 s |
+| Trial 2 | 30.440 s | 18.902 s |
+| Trial 3 | 30.091 s | 18.834 s |
+| **Median** | **30.091 s** | **18.902 s** |
 
-*First browser action dispatched in ~8.5 seconds. Task completed in 4 discrete steps (Search focus → Enter query → Click result → Complete).*
+*Task completed in 4 discrete single-token scoring steps.*
 
 ### 2. Multi-Scenario Suite Performance
 
-| Scenario & Task | Actual Execution Time | Actions Executed | Independent Verification |
-| :--- | :---: | :---: | :--- |
-| **Workspace Settings Form** (Name, timezone dropdown, toggle weekly digest) | **12.002 s** | Fill, Select, Toggle, Save | Exact match on saved confirmation notification |
-| **Local Reading Room Navigation** | **5.430 s** | Search, Link Click | Exact match on target article URL and title |
-| **Python.org Navigation** (Navigate to About page) | **8.095 s** | Nav menu hover & click | Exact match on target `/about/` URL |
-| **Example.com → IANA Info** | **7.309 s** | Anchor detection & jump | Exact match on destination domain |
+| Scenario & Task | Qwen3.5-9B Task Time | Qwen3.5-35B-A3B Task Time | Actions Executed | Independent Verification |
+| :--- | :---: | :---: | :---: | :--- |
+| **Wikipedia Navigation** (Find & open Python article) | **30.091 s** | **18.902 s** | Search focus, fill, select result, done | Strict match on final canonical URL & page title |
+| **Workspace Settings Form** (Name, timezone dropdown, toggle weekly digest) | **12.002 s** | — | Fill, Select, Toggle, Save | Exact match on saved confirmation notification |
+| **Local Reading Room Navigation** | **5.430 s** | — | Search, Link Click | Exact match on target article URL and title |
+| **Python.org Navigation** (Navigate to About page) | **8.095 s** | — | Nav menu hover & click | Exact match on target `/about/` URL |
+| **Example.com → IANA Info** | **7.309 s** | — | Anchor detection & jump | Exact match on destination domain |
 
 ---
 
@@ -223,8 +224,14 @@ Apple Silicon and PyTorch elsewhere; `--backend torch` selects PyTorch explicitl
 # From a checkout on a Linux GPU server
 uv sync --locked --extra torch --python 3.12
 uv run fbu install-browser --with-deps
-uv run fbu download --backend torch
-uv run fbu record --backend torch --device cuda --scenario wikipedia
+
+# Download 9B weights (default) or 35B-A3B weights
+uv run fbu download --backend torch --model 9b
+uv run fbu download --backend torch --model 35b
+
+# Compare and record 9B vs 35B-A3B tasks
+uv run fbu record --backend torch --device cuda --model 9b --scenario wikipedia --output artifacts/wikipedia_9b
+uv run fbu record --backend torch --device cuda --model 35b --scenario wikipedia --output artifacts/wikipedia_35b
 ```
 
 `--with-deps` installs Chromium's Linux system libraries and may require root/sudo. Neither a desktop,
@@ -236,11 +243,13 @@ For a globally available CLI:
 ```bash
 uv tool install --python 3.12 'fast-browser-use[torch] @ git+https://github.com/APUS-AI-Lab/fast-browser-use.git'
 fbu install-browser --with-deps  # On Windows/macOS, omit --with-deps
-fbu download --backend torch
+fbu download --backend torch --model 9b
 ```
 
-PyTorch uses the pinned original [Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B)
-checkpoint through the [Transformers text-only loader](https://huggingface.co/docs/transformers/model_doc/qwen3_5).
+PyTorch supports selecting between the pinned original [Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B)
+and the MoE [Qwen/Qwen3.5-35B-A3B](https://huggingface.co/Qwen/Qwen3.5-35B-A3B) checkpoints
+through the [Transformers text-only loader](https://huggingface.co/docs/transformers/model_doc/qwen3_5).
+Select via `--model 9b` / `--model 35b` or `FBU_MODEL=35b` (defaults to `9b`).
 MLX 4-bit files cannot be reused by PyTorch. When switching backends, remove an old `FBU_MODEL`
 override or point it to matching local weights. Downloads use Hugging Face; the existing ModelScope
 mirror is available for MLX only. After downloading, `HF_HUB_OFFLINE=1` prevents further Hub access;
@@ -251,7 +260,7 @@ browsing live websites still requires network access.
 | `FBU_BACKEND` / `--backend` | `auto`, `mlx`, `torch` |
 | `FBU_DEVICE` / `--device` | `auto` → available CUDA, otherwise CPU; `cpu`, `cuda`, `cuda:N` |
 | `FBU_DTYPE` / `--dtype` | `auto` → CUDA BF16 if supported, otherwise FP16; CPU FP32. Explicit `bfloat16`, `float16`, `float32` |
-| `FBU_MODEL` | Backend's pinned repository, or a local compatible model directory |
+| `FBU_MODEL` / `--model` | Pinned repository, aliases (`9b`, `35b`), or a local compatible model directory |
 
 CUDA runs on one selected GPU; `cuda:N` uses the index visible to PyTorch (including
 `CUDA_VISIBLE_DEVICES`). Install a [PyTorch build matching your GPU driver](https://pytorch.org/get-started/locally/)
@@ -259,8 +268,9 @@ if the installed build does not expose CUDA. On Windows, the same CLI works from
 use `$env:FBU_BACKEND='torch'` when setting environment variables.
 
 Allow roughly 18 GB for 9B BF16/FP16 weights alone, plus cache and working memory; a 24 GB GPU is a
-starting point, not a guarantee for every page. CPU defaults to FP32 (roughly 36 GB for weights alone)
-and is considerably slower. This backend does not load 4-bit weights or shard across GPUs.
+starting point. For 35B-A3B unquantized BF16/FP16 weights (roughly 70 GB alone; 35B total / 3B active parameters),
+an 80 GB GPU (such as an A100/H100) is recommended.
+CPU defaults to FP32 and is significantly slower. Current PyTorch execution does not load 4-bit weights or shard across multiple GPUs.
 Optional optimized DeltaNet kernels are not required. Existing latency measurements are MLX results;
 PyTorch currently recomputes the prompt for each score and does not reuse a prefix between decisions.
 
@@ -364,6 +374,7 @@ labeled playback speeds (preview rendering requires `ffmpeg`/`ffprobe`; raw reco
 ```bash
 # Headless recording: saves 1x original video + telemetry, including inference/waits
 uv run fbu record --scenario wikipedia
+uv run fbu record --scenario wikipedia --model 35b
 
 # Render labeled preview (target <= 10s with preserved original)
 uv run python scripts/render_demo.py artifacts/recordings/<timestamp> --max-seconds 10

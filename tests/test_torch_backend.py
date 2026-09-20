@@ -88,6 +88,57 @@ def test_torch_loader_is_local_only_and_rejects_missing_language_weights(tmp_pat
     )
 
 
+def supported_moe_config():
+    return {
+        "model_type": "qwen3_5_moe",
+        "text_config": {
+            "hidden_size": 2048,
+            "num_hidden_layers": 40,
+            "moe_intermediate_size": 512,
+            "shared_expert_intermediate_size": 512,
+            "num_experts": 256,
+            "num_experts_per_tok": 8,
+        },
+    }
+
+
+def test_torch_loader_loads_supported_moe_35b(tmp_path, monkeypatch):
+    (tmp_path / "config.json").write_text(json.dumps(supported_moe_config()))
+    network_model, tokenizer = Mock(), Mock()
+    moe_loader = Mock()
+    moe_loader.from_pretrained.return_value = (network_model, {"missing_keys": []})
+    tokenizer_loader = Mock()
+    tokenizer_loader.from_pretrained.return_value = tokenizer
+    monkeypatch.setitem(sys.modules, "transformers", SimpleNamespace(
+        Qwen3_5ForCausalLM=Mock(), Qwen3_5MoeForCausalLM=moe_loader, AutoTokenizer=tokenizer_loader,
+    ))
+    assert load_torch_model(tmp_path, "cpu", "float32") == (network_model.eval.return_value, tokenizer)
+    moe_loader.from_pretrained.assert_called_once_with(
+        tmp_path, dtype="float32", device_map={"": "cpu"}, local_files_only=True,
+        trust_remote_code=False, output_loading_info=True,
+    )
+    tokenizer_loader.from_pretrained.assert_called_once_with(
+        tmp_path, local_files_only=True, trust_remote_code=False,
+    )
+
+
+@pytest.mark.parametrize("field,value", [
+    ("hidden_size", 4096), ("num_hidden_layers", 32), ("moe_intermediate_size", 1024),
+    ("shared_expert_intermediate_size", None), ("num_experts", 128), ("num_experts_per_tok", 4),
+])
+def test_torch_rejects_incompatible_moe_shapes(tmp_path, monkeypatch, field, value):
+    observed = supported_moe_config()
+    observed["text_config"][field] = value
+    (tmp_path / "config.json").write_text(json.dumps(observed))
+    moe_loader = Mock()
+    monkeypatch.setitem(sys.modules, "transformers", SimpleNamespace(
+        Qwen3_5ForCausalLM=Mock(), Qwen3_5MoeForCausalLM=moe_loader, AutoTokenizer=Mock(),
+    ))
+    with pytest.raises(ValueError, match="Qwen3.5-35B-A3B"):
+        load_torch_model(tmp_path, "cpu", "float32")
+    moe_loader.from_pretrained.assert_not_called()
+
+
 @pytest.fixture
 def torch():
     return pytest.importorskip("torch")

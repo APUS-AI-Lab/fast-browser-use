@@ -248,3 +248,34 @@ def test_qwen_thinking_uses_the_boundary_from_its_chat_template(monkeypatch):
     assert stream.call_args.kwargs["prompt"].endswith("<think>\n")
     assert engine.score.call_args.kwargs["continuation"] == "Already submitted.</think>\nAction code: "
     assert telemetry["reasoning"]["end_marker"] == "</think>"
+
+
+@pytest.mark.parametrize("input_name,expected_model,expected_rev", [
+    ("9b", model.TORCH_MODEL, model.TORCH_REVISION),
+    ("35b", model.TORCH_35B_MODEL, model.TORCH_35B_REVISION),
+    ("35b-a3b", model.TORCH_35B_MODEL, model.TORCH_35B_REVISION),
+    ("Qwen/Qwen3.5-35B-A3B", model.TORCH_35B_MODEL, model.TORCH_35B_REVISION),
+    (None, model.TORCH_MODEL, model.TORCH_REVISION),
+])
+def test_torch_model_source_resolution(monkeypatch, input_name, expected_model, expected_rev):
+    monkeypatch.delenv("FBU_MODEL", raising=False)
+    assert model.model_source("torch", input_name) == (expected_model, expected_rev)
+
+
+def test_torch_model_source_rejects_unknown(monkeypatch):
+    monkeypatch.delenv("FBU_MODEL", raising=False)
+    with pytest.raises(ValueError, match="FBU_MODEL"):
+        model.model_source("torch", "unknown_model")
+
+
+
+def test_torch_model_location_uses_snapshot_download_for_named_model(monkeypatch):
+    download = Mock(return_value="/downloaded/location")
+    monkeypatch.setitem(sys.modules, "huggingface_hub", SimpleNamespace(snapshot_download=download))
+    name, rev, loc = model.model_location("35b", "torch")
+    assert (name, rev, loc) == (model.TORCH_35B_MODEL, model.TORCH_35B_REVISION, "/downloaded/location")
+    download.assert_called_once_with(
+        model.TORCH_35B_MODEL, revision=model.TORCH_35B_REVISION,
+        allow_patterns=["*.json", "*.jinja", "*.safetensors"],
+    )
+

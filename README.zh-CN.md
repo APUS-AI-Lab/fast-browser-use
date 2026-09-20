@@ -5,12 +5,12 @@
 # Fast Browser Use
 
 **面向 Claude Code、Codex、OpenCode 等 Agent 的端侧极速“系统 1”浏览器自动化引擎与 Agent Skill。**  
-*基于 Qwen3.5-9B，通过 MLX 或 PyTorch（CUDA / CPU）本地运行。零云端推理、秒级反射决策、从结构上彻底杜绝选择器幻觉。*
+*基于 Qwen3.5-9B/Qwen3.5-35B-A3B，通过 MLX 或 PyTorch（CUDA / CPU）本地运行。零云端推理、秒级反射决策、从结构上彻底杜绝选择器幻觉。*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linuxwindowsgpu-服务器pytorch)
-[![Model: Qwen3.5-9B-4bit](https://img.shields.io/badge/Model-Qwen3.5--9B--4bit-purple.svg)](https://huggingface.co/Qwen/Qwen3.5-9B)
+[![Model: Qwen3.5-9B | 35B-A3B](https://img.shields.io/badge/Model-Qwen3.5--9B%20%7C%2035B--A3B-purple.svg)](https://huggingface.co/Qwen)
 [![Cloud Inference: None](https://img.shields.io/badge/云端推理-零调用%20(%20100%25%20离线本地%20)-orange.svg)](#-本地端侧架构)
 [![Agent Skill: Claude Code & Codex](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%7C%20Codex-brightgreen.svg)](skills/fast-browser-use/SKILL.md)
 
@@ -21,13 +21,13 @@
 ---
 
 <div align="center">
-<a href="docs/demo.mp4"><img src="docs/demo.gif" alt="本地 Qwen3.5 浏览器真实操作，明确标注为 4x 倍速播放" width="100%" /></a>
+<a href="docs/qwen35b-demo.mp4"><img src="docs/qwen35b-demo.gif" alt="本地 Qwen3.5-35B-A3B 浏览器真实操作，明确标注为 3x 倍速播放" width="100%" /></a>
 
-**[8.32 秒 MP4 预览（4× 倍速播放）](docs/demo.mp4)** · **[实测遥测数据（JSON）](docs/measurement.json)** · **[性能基准与测试协议](docs/performance.md)**
+**[录屏预览（3× 倍速播放）](docs/qwen35b-demo.mp4)** · **[实测遥测数据（JSON）](docs/qwen35b-demo-measurement.json)** · **[性能基准与测试协议](docs/performance.md)**
 </div>
 
 > **Jev 离散决策范式的开源逆向实现 · 纯本地 Browser-Use Agent Skill**  
-> 本项目基于开源模型（Qwen3.5-9B）复刻 Jev 的“系统 1”离散打分思想，以浏览器自动化（Browser-use）为落地场景。通过将可见交互原子映射为 Token 进行单步 Logits 打分，从机制上彻底杜绝选择器幻觉，并封装为开箱即用的 Agent Skill，支持纯本地模型离线执行。
+> 本项目基于开源模型（Qwen3.5-9B/Qwen3.5-35B-A3B）复刻 Jev 的“系统 1”离散打分思想，以浏览器自动化（Browser-use）为落地场景。通过将可见交互原子映射为 Token 进行单步 Logits 打分，从机制上彻底杜绝选择器幻觉，并封装为开箱即用的 Agent Skill，支持纯本地模型离线执行。
 
 ---
 
@@ -45,7 +45,7 @@ TypeSafe AI 由此提出了“系统 1”决策模型的理念：将 GPT、Claud
 
 **Fast Browser Use 是对 Jev 底层决策范式的一次开源逆向工程实现，并将其完整落地于最具代表性的浏览器自动化（Browser-use）场景。**
 
-我们基于 Jev 公开文档展示的输入范式与评估逻辑，以及借鉴了一些开源项目的思路，逆向拆解了其“跳过自回归解码、隐状态直接打分”的核心逻辑。为了检验这套思路在没有闭源权重的前提下是否可行，我们以本地开源模型 **Qwen3.5-9B** 与消费级 Apple Silicon（MLX）为底座，构建了端到端的浏览器自动化 Agent Skill：
+我们基于 Jev 公开文档展示的输入范式与评估逻辑，以及借鉴了一些开源项目的思路，逆向拆解了其“跳过自回归解码、隐状态直接打分”的核心逻辑。为了检验这套思路在没有闭源权重的前提下是否可行，我们以本地开源模型 **Qwen3.5-9B/Qwen3.5-35B-A3B** 与消费级 Apple Silicon（MLX）/ GPU（PyTorch）为底座，构建了端到端的浏览器自动化 Agent Skill：
 
 - **从生成代码到受限单选**：传统 Browser-use 方案让大模型编写 Playwright 脚本或猜测选择器，极易在动态页面上产生“选择器幻觉”。Fast Browser Use 在宿主端原子化扫描当前渲染树中**真实可见、可交互**的元素，组装为离散候选元组 `(CLICK, btn_7)`、`(SELECT, opt_2)`。模型只在客观存在的候选中做单选，从结构上彻底杜绝选择器幻觉；
 - **单 Token Logits 秒级反射（$O(1)$ 决策）**：每个合法候选动作映射到模型词表中的独立单个 Token，单步前向传播提取 Next-token Logits 并做 Softmax 归一化（**单步秒级即时响应**），彻底省去多秒的自回归文本解码；
@@ -137,32 +137,33 @@ $$P(c_i \mid \text{Context}) = \frac{\exp(z_i / T)}{\sum_{j=1}^K \exp(z_j / T)}$
 
 ## ⚡ 实测基准数据
 
-以下数据均在本地消费级设备上**100% 离线完成**（无任何云端推理请求）：
+以下数据均在消费级设备上使用 **100% 本地推理**（无任何云端推理请求；真实网页仍需联网）：
 - **运行设备**：Apple Silicon Mac（Apple M2 Pro，32 GB 统一内存，macOS）
 - **推理后端**：MLX 0.32.2 / MLX-LM 0.31.3
-- **本地权重**：`Qwen3.5-9B MLX 4-bit`（显存占用约 5.95 GB）
+- **基线模型**：`Qwen3.5-9B MLX 4-bit` 与 `Qwen3.5-35B-A3B MLX 4-bit`
 
 ### 1. Wikipedia 维基百科真实任务实测
 
 任务目标：*“从英文首页出发，检索并打开介绍 Python 编程语言的词条，严格校验最终 URL 与页面标题。”*
 
-| 测试轮次 | 实际任务耗时 |
-| :---: | :---: |
-| 第 1 次 | 30.079 秒 |
-| 第 2 次 | 30.440 秒 |
-| 第 3 次 | 30.091 秒 |
-| **中位数** | **30.091 秒** |
+| 测试轮次 | Qwen3.5-9B 耗时 | Qwen3.5-35B-A3B 耗时 |
+| :---: | :---: | :---: |
+| 第 1 次 | 30.079 秒 | 19.152 秒 |
+| 第 2 次 | 30.440 秒 | 18.902 秒 |
+| 第 3 次 | 30.091 秒 | 18.834 秒 |
+| **中位数** | **30.091 秒** | **18.902 秒** |
 
-*首个动作发出仅需约 8.5 秒，全流程仅需 4 次单 Token 快速打分即可完成全目标操作。*
+*全流程仅需 4 次单 Token 快速打分即可完成全目标操作。*
 
 ### 2. 多场景实测性能汇总
 
-| 任务用例 | 实际任务耗时 | 包含动作 | 独立业务断言 |
-| :--- | :---: | :---: | :--- |
-| **工作区偏好设置表单**（名称、时区、开启周报） | **12.002 秒** | 输入、下拉选择、复选框勾选、保存 | 严格核验最终提示文本中的三项保存值 |
-| **本地阅读室文章导航** | **5.430 秒** | 列表检索、链接点击 | 精确匹配目标 URL 与文章标题 |
-| **Python.org 官网导航**（跳转 About 页面） | **8.095 秒** | 导航栏识别、跨页跳转 | 精确匹配目标页面 URL (`.../about/`) |
-| **Example.com → IANA 信息页导航** | **7.309 秒** | 锚点识别、域名跳转 | 精确匹配目标页面 URL |
+| 任务用例 | Qwen3.5-9B 耗时 | Qwen3.5-35B-A3B 耗时 | 包含动作 | 独立业务断言 |
+| :--- | :---: | :---: | :---: | :--- |
+| **Wikipedia 维基百科长程任务**（检索并打开 Python 词条） | **30.091 秒** | **18.902 秒** | 搜索聚焦、输入、结果选择、完成 | 严格核验最终 URL 与页面标题 |
+| **工作区偏好设置表单**（名称、时区、开启周报） | **12.002 秒** | — | 输入、下拉选择、复选框勾选、保存 | 严格核验最终提示文本中的三项保存值 |
+| **本地阅读室文章导航** | **5.430 秒** | — | 列表检索、链接点击 | 精确匹配目标 URL 与文章标题 |
+| **Python.org 官网导航**（跳转 About 页面） | **8.095 秒** | — | 导航栏识别、跨页跳转 | 精确匹配目标页面 URL (`.../about/`) |
+| **Example.com → IANA 信息页导航** | **7.309 秒** | — | 锚点识别、域名跳转 | 精确匹配目标页面 URL |
 
 ---
 
@@ -224,8 +225,14 @@ Apple Silicon 上选择 MLX，其它平台选择 PyTorch；可通过 `--backend 
 # 在远程 Linux GPU 服务器的项目目录内执行
 uv sync --locked --extra torch --python 3.12
 uv run fbu install-browser --with-deps
-uv run fbu download --backend torch
-uv run fbu record --backend torch --device cuda --scenario wikipedia
+
+# 下载 9B 权重（默认）或 35B-A3B 权重
+uv run fbu download --backend torch --model 9b
+uv run fbu download --backend torch --model 35b
+
+# 9B 与 35B-A3B 任务对比评测与录屏
+uv run fbu record --backend torch --device cuda --model 9b --scenario wikipedia --output artifacts/wikipedia_9b
+uv run fbu record --backend torch --device cuda --model 35b --scenario wikipedia --output artifacts/wikipedia_35b
 ```
 
 `--with-deps` 安装 Chromium 的 Linux 系统依赖，可能需要 root/sudo 权限。操作和录屏无需桌面、
@@ -236,11 +243,11 @@ uv run fbu record --backend torch --device cuda --scenario wikipedia
 ```bash
 uv tool install --python 3.12 'fast-browser-use[torch] @ git+https://github.com/APUS-AI-Lab/fast-browser-use.git'
 fbu install-browser --with-deps  # Windows/macOS 去掉 --with-deps
-fbu download --backend torch
+fbu download --backend torch --model 9b
 ```
 
-PyTorch 使用固定版本的原版 [Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B)，通过
-[Transformers 纯文本加载器](https://huggingface.co/docs/transformers/model_doc/qwen3_5) 运行。
+PyTorch 支持选择使用固定版本的原版 [Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B) 或 MoE 架构的 [Qwen/Qwen3.5-35B-A3B](https://huggingface.co/Qwen/Qwen3.5-35B-A3B)，通过
+[Transformers 纯文本加载器](https://huggingface.co/docs/transformers/model_doc/qwen3_5) 运行。可通过 `--model 9b` / `--model 35b` 或环境变量 `FBU_MODEL=35b` 切换（默认 `9b`）。
 **MLX 4-bit 权重不能用于 PyTorch**；切换后端时清除旧 `FBU_MODEL`，或将其指向匹配的本地权重目录。
 PyTorch 从 Hugging Face 下载；现有 ModelScope 镜像仅用于 MLX。下载后设置 `HF_HUB_OFFLINE=1`
 可禁止后续 Hub 访问，访问在线网页仍需网络。
@@ -250,14 +257,15 @@ PyTorch 从 Hugging Face 下载；现有 ModelScope 镜像仅用于 MLX。下载
 | `FBU_BACKEND` / `--backend` | `auto`、`mlx`、`torch` |
 | `FBU_DEVICE` / `--device` | `auto` 优先使用可用 CUDA，否则 CPU；支持 `cpu`、`cuda`、`cuda:N` |
 | `FBU_DTYPE` / `--dtype` | `auto` 在 CUDA 上优先 BF16，否则 FP16；CPU 默认 FP32。可指定 `bfloat16`、`float16`、`float32` |
-| `FBU_MODEL` | 当前后端的固定版本仓库，或匹配的本地权重目录 |
+| `FBU_MODEL` / `--model` | 当前后端的固定版本仓库、别名（`9b`、`35b`），或匹配的本地权重目录 |
 
 CUDA 使用指定的单张 GPU，编号遵循 PyTorch 可见设备（包括 `CUDA_VISIBLE_DEVICES`）。如果无法识别 GPU，
 请安装[与驱动匹配的 PyTorch 构建](https://pytorch.org/get-started/locally/)。Windows PowerShell 可使用相同 CLI，
 设置环境变量的语法为 `$env:FBU_BACKEND='torch'`。
 
 9B 的 BF16/FP16 权重本身约需 18 GB，另需缓存和计算空间；24 GB GPU 可作为起点，但不保证所有页面均可容纳。
-CPU 默认 FP32，权重本身约需 36 GB，速度也会慢很多。当前 PyTorch 后端不加载 4-bit 权重，也不跨 GPU 分片。
+35B-A3B 的 BF16/FP16 权重本身约需 70 GB（总参数 35B，每个 token 激活约 3B），建议 80 GB GPU（如 A100/H100 80GB）。
+CPU 默认 FP32，速度会慢很多。当前 PyTorch 后端不加载 4-bit 权重，也不跨 GPU 分片。
 无需安装可选 DeltaNet 加速内核。现有性能数据均来自 MLX；PyTorch 每次候选打分重新计算提示，不跨决策复用前缀缓存。
 
 ### 💻 独立 CLI 运行与 CI 业务断言
@@ -355,8 +363,9 @@ Playwright 直接采集浏览器画面，无需桌面录屏。原速视频保留
 生成预览需额外安装 `ffmpeg`/`ffprobe`，原始录屏无需该系统命令：
 
 ```bash
-# 执行录屏场景（保留 1x 原始视频与全量 telemetry）
+# 执行录屏场景（保留 1x 原始视频与全量 telemetry，支持 --model 9b 或 --model 35b）
 uv run fbu record --scenario wikipedia
+uv run fbu record --scenario wikipedia --model 35b
 
 # 渲染带倍速角标的短预览（目标 <= 10 秒，保留原始录屏）
 uv run python scripts/render_demo.py artifacts/recordings/<timestamp> --max-seconds 10

@@ -40,11 +40,12 @@ def main():
     web.add_argument("--port", type=int, default=int(os.environ.get("FBU_PORT", "8767")))
     for command in (run, recording, download, web):
         command.add_argument("--backend", choices=["auto", "mlx", "torch"], help="Overrides FBU_BACKEND")
+        command.add_argument("--model", help="Model name, alias (9b, 35b) or local directory (FBU_MODEL)")
     for command in (run, recording, web):
         command.add_argument("--device", help="PyTorch device: auto, cpu, cuda or cuda:N (FBU_DEVICE)")
         command.add_argument("--dtype", choices=["auto", "float32", "float16", "bfloat16"], help="PyTorch dtype")
     args = parser.parse_args()
-    for option in ("backend", "device", "dtype"):
+    for option in ("backend", "device", "dtype", "model"):
         value = getattr(args, option, None)
         if value is not None:
             os.environ[f"FBU_{option.upper()}"] = value
@@ -79,7 +80,10 @@ def main():
             if args.backend == "torch":
                 parser.error("--source mlx downloads MLX weights; use --source huggingface with --backend torch")
             backend = "mlx"
-        name, revision = model_source(backend)
+        try:
+            name, revision = model_source(backend, args.model)
+        except ValueError as exc:
+            parser.error(str(exc))
         if args.source == "modelscope":
             if backend != "mlx":
                 parser.error("The ModelScope mirror is pinned for MLX only; use --source huggingface for PyTorch")
