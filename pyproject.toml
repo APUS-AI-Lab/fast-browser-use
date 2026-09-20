@@ -12,6 +12,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+torch = ["torch>=2.6,<3", "transformers>=5.17,<6", "accelerate>=1.10,<2"]
 modelscope = ["modelscope>=1.30,<2", "requests>=2.32", "tqdm>=4.67"]
 
 [project.scripts]

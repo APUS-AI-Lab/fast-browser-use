@@ -57,7 +57,7 @@ def test_modelscope_converted_repository_is_downloaded_directly(monkeypatch, tmp
         sys,
         "argv",
         [
-            "fbu", "download", "--source", "modelscope",
+            "fbu", "download", "--backend", "mlx", "--source", "modelscope",
             "--revision", "pinned-revision", "--output", str(tmp_path),
         ],
     )
@@ -148,10 +148,43 @@ def test_download_defaults_to_pinned_qwen_without_conversion(monkeypatch, source
     module = "huggingface_hub" if source == "mlx" else "modelscope"
     monkeypatch.setitem(sys.modules, module, SimpleNamespace(snapshot_download=download))
     monkeypatch.setattr(cli, "load_environment", lambda: None)
-    monkeypatch.setattr(sys, "argv", ["fbu", "download", "--source", source])
+    monkeypatch.setattr(sys, "argv", ["fbu", "download", "--backend", "mlx", "--source", source])
     cli.main()
     download.assert_called_once_with(
         DEFAULT_MODEL, revision=DEFAULT_REVISION if source == "mlx" else MODELSCOPE_REVISION,
         local_dir=None if source == "mlx" else "models/Qwen3.5-9B-4bit",
         allow_patterns=["*.json", "*.jinja", "*.safetensors"],
     )
+
+
+def test_install_browser_can_install_linux_dependencies(monkeypatch):
+    install = Mock(return_value=SimpleNamespace(returncode=0))
+    monkeypatch.setattr(cli, "load_environment", lambda: None)
+    monkeypatch.setattr(cli.subprocess, "run", install)
+    monkeypatch.setattr(sys, "argv", ["fbu", "install-browser", "--with-deps"])
+    cli.main()
+    install.assert_called_once_with(
+        [sys.executable, "-m", "playwright", "install", "--with-deps", "chromium"], check=False,
+    )
+
+
+def test_torch_download_uses_original_pinned_weights_without_inference(monkeypatch):
+    from fast_browser_use.model import TORCH_MODEL, TORCH_REVISION
+
+    download = Mock(return_value="/cached/qwen")
+    monkeypatch.setitem(sys.modules, "huggingface_hub", SimpleNamespace(snapshot_download=download))
+    monkeypatch.setattr(cli, "load_environment", lambda: None)
+    monkeypatch.setattr(sys, "argv", ["fbu", "download", "--backend", "torch"])
+    cli.main()
+    download.assert_called_once_with(
+        TORCH_MODEL, revision=TORCH_REVISION, local_dir=None,
+        allow_patterns=["*.json", "*.jinja", "*.safetensors"],
+    )
+
+
+@pytest.mark.parametrize("source", ["mlx", "modelscope"])
+def test_incompatible_torch_download_source_fails_before_downloading(monkeypatch, source):
+    monkeypatch.setattr(cli, "load_environment", lambda: None)
+    monkeypatch.setattr(sys, "argv", ["fbu", "download", "--backend", "torch", "--source", source])
+    with pytest.raises(SystemExit):
+        cli.main()

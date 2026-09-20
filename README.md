@@ -5,12 +5,12 @@
 # Fast Browser Use
 
 **An ultra-fast, local-first "System 1" browser automation engine & Agent Skill for Claude Code, Codex, and Cursor.**  
-*Powered by Qwen3.5-9B on Apple Silicon MLX. Zero cloud inference, second-level reflexes, zero selector hallucinations.*
+*Powered by local Qwen3.5-9B via MLX or PyTorch (CUDA / CPU). Zero cloud inference, second-level reflexes, zero selector hallucinations.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Platform: Apple Silicon](https://img.shields.io/badge/Platform-macOS%20Apple%20Silicon%20(MLX)-black.svg)](https://github.com/ml-explore/mlx)
-[![Model: Qwen3.5-9B-4bit](https://img.shields.io/badge/Model-Qwen3.5--9B--4bit-purple.svg)](https://huggingface.co/mlx-community/Qwen2.5-Coder-7B-Instruct-4bit)
+[![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linux--windows--gpu-servers-pytorch)
+[![Model: Qwen3.5-9B-4bit](https://img.shields.io/badge/Model-Qwen3.5--9B--4bit-purple.svg)](https://huggingface.co/Qwen/Qwen3.5-9B)
 [![Cloud Inference: None](https://img.shields.io/badge/Cloud%20API-Zero%20(%20100%25%20Offline%20)-orange.svg)](#-local-first-architecture)
 [![Agent Skill: Claude Code & Codex](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%7C%20Codex-brightgreen.svg)](skills/fast-browser-use/SKILL.md)
 
@@ -50,7 +50,7 @@ By analyzing Jev's documented interface paradigms and evaluation logic, as well 
 - **From Code Generation to Bounded Categorical Choice**: Traditional browser agents ask an LLM to generate raw Playwright scripts or CSS selectors, frequently causing "selector hallucinations" on dynamic pages. Fast Browser Use scans the rendered DOM tree, extracts only visible, interactable elements, and formats them into discrete candidate tuples `(CLICK, btn_7)`. The model selects exclusively from objectively existing elements—eliminating selector hallucinations by design.
 - **Single-Token Logits Scoring ($O(1)$ Reflexes)**: Legal candidate actions are dynamically mapped to single discrete tokens in the vocabulary (`A`, `B`, `C`...). With a single forward pass, the engine evaluates normalized Softmax probabilities over candidate logits in **seconds (single forward pass)**, skipping the multi-second autoregressive text decoding loop entirely.
 - **Decoupled Action & Generation**: Structural page actions (click, select, scroll) use discrete logits scoring; generative text completion is invoked only when typing content into fields (`TYPE_TEXT`).
-- **100% Offline & Private**: Zero cloud API calls, zero telemetry, and zero subscription costs. The entire loop executes in local unified memory on Apple Silicon via MLX.
+- **100% Offline & Private**: Zero cloud API calls, zero telemetry, and zero subscription costs. The entire inference loop runs on your machine through MLX or PyTorch.
 
 ---
 
@@ -58,12 +58,12 @@ By analyzing Jev's documented interface paradigms and evaluation logic, as well 
 
 | Dimension | Traditional Cloud Multimodal Agents | Fast Browser Use (Local System 1) |
 | :--- | :--- | :--- |
-| **Inference Location** | Cloud APIs (OpenAI, Anthropic, etc.) | **100% Local** (Apple Silicon MLX) |
+| **Inference Location** | Cloud APIs (OpenAI, Anthropic, etc.) | **100% Local** (MLX or PyTorch CUDA / CPU) |
 | **Step Latency** | 3,000 – 8,000 ms (Network + Decoding) | **Second-level** (Pure Logits Forward Pass) |
 | **Decision Mechanism** | Autoregressive text/JSON generation | **Discrete candidate selection** (Single-Token) |
 | **Selector Reliability** | Prone to invented CSS/XPath selectors | **Zero Hallucination** (Derived from visible DOM) |
 | **Syntax Validity** | Subject to broken JSON, missing quotes | **100% Valid Syntax** (Deterministic host assembly) |
-| **Data Privacy** | Full pages/screenshots transmitted to cloud | **100% Air-Gapped**, data never leaves your Mac |
+| **Data Privacy** | Full pages/screenshots transmitted to cloud | **100% Air-Gapped**, inference data stays on your machine |
 | **Inference Cost** | Pay per token / per screenshot | **$0.00** (Free, on-device compute) |
 | **Host Integration** | Standalone monolithic agent | **Standard Agent Skill** for Claude Code & Codex |
 
@@ -168,8 +168,8 @@ Task: *"Find and open the Wikipedia article about Python (programming language) 
 ## 🚀 Quickstart
 
 ### Prerequisites
-- **Hardware**: Apple Silicon Mac (M1/M2/M3/M4, 16 GB+ unified memory recommended)
-- **System**: macOS, Python 3.12+, [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- **Hardware**: Apple Silicon for MLX; NVIDIA GPU or CPU for PyTorch. See memory requirements below.
+- **System**: Linux, Windows or macOS; Python 3.12+, [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - **Optional**: Node.js / npm (for `npx skills` installation)
 
 ---
@@ -185,6 +185,8 @@ npx skills add APUS-AI-Lab/fast-browser-use --skill fast-browser-use -a claude-c
 ```
 
 #### Step 2: Install Local Runtime and Download Model Weights
+
+Apple Silicon / MLX (for other platforms, use the PyTorch setup below):
 ```bash
 # 1. Install the CLI in an isolated Python environment
 uv tool install --python 3.12 "git+https://github.com/APUS-AI-Lab/fast-browser-use.git"
@@ -211,6 +213,56 @@ $fast-browser-use Open https://en.wikipedia.org/wiki/Main_Page, find the Python 
 ```
 
 ---
+
+### Linux / Windows / GPU servers (PyTorch)
+
+The `torch` extra adds PyTorch, Transformers and Accelerate. `FBU_BACKEND=auto` selects MLX on
+Apple Silicon and PyTorch elsewhere; `--backend torch` selects PyTorch explicitly.
+
+```bash
+# From a checkout on a Linux GPU server
+uv sync --locked --extra torch --python 3.12
+uv run fbu install-browser --with-deps
+uv run fbu download --backend torch
+uv run fbu record --backend torch --device cuda --scenario wikipedia
+```
+
+`--with-deps` installs Chromium's Linux system libraries and may require root/sudo. Neither a desktop,
+`DISPLAY`, Xvfb, VNC nor the inspector is needed. All recordings explicitly use headless Chromium.
+The original `browser.webm`, screenshots, trace and independent verification are saved on the server.
+
+For a globally available CLI:
+
+```bash
+uv tool install --python 3.12 'fast-browser-use[torch] @ git+https://github.com/APUS-AI-Lab/fast-browser-use.git'
+fbu install-browser --with-deps  # On Windows/macOS, omit --with-deps
+fbu download --backend torch
+```
+
+PyTorch uses the pinned original [Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B)
+checkpoint through the [Transformers text-only loader](https://huggingface.co/docs/transformers/model_doc/qwen3_5).
+MLX 4-bit files cannot be reused by PyTorch. When switching backends, remove an old `FBU_MODEL`
+override or point it to matching local weights. Downloads use Hugging Face; the existing ModelScope
+mirror is available for MLX only. After downloading, `HF_HUB_OFFLINE=1` prevents further Hub access;
+browsing live websites still requires network access.
+
+| Setting | Default / supported values |
+| :--- | :--- |
+| `FBU_BACKEND` / `--backend` | `auto`, `mlx`, `torch` |
+| `FBU_DEVICE` / `--device` | `auto` → available CUDA, otherwise CPU; `cpu`, `cuda`, `cuda:N` |
+| `FBU_DTYPE` / `--dtype` | `auto` → CUDA BF16 if supported, otherwise FP16; CPU FP32. Explicit `bfloat16`, `float16`, `float32` |
+| `FBU_MODEL` | Backend's pinned repository, or a local compatible model directory |
+
+CUDA runs on one selected GPU; `cuda:N` uses the index visible to PyTorch (including
+`CUDA_VISIBLE_DEVICES`). Install a [PyTorch build matching your GPU driver](https://pytorch.org/get-started/locally/)
+if the installed build does not expose CUDA. On Windows, the same CLI works from PowerShell;
+use `$env:FBU_BACKEND='torch'` when setting environment variables.
+
+Allow roughly 18 GB for 9B BF16/FP16 weights alone, plus cache and working memory; a 24 GB GPU is a
+starting point, not a guarantee for every page. CPU defaults to FP32 (roughly 36 GB for weights alone)
+and is considerably slower. This backend does not load 4-bit weights or shard across GPUs.
+Optional optimized DeltaNet kernels are not required. Existing latency measurements are MLX results;
+PyTorch currently recomputes the prompt for each score and does not reuse a prefix between decisions.
 
 ### 💻 Standalone CLI Usage & CI Assertions
 
@@ -305,10 +357,12 @@ with Agent("https://example.com", "Open the More information link.") as agent:
 
 ## 🎥 Recording & Reproducing Demos
 
-Generate auditable video recordings with labeled playback speeds:
+Recordings use Playwright Chromium video capture in headless mode, even if `FBU_HEADLESS=0`
+is set for interactive debugging. No desktop recorder is used. Generate auditable videos with
+labeled playback speeds (preview rendering requires `ffmpeg`/`ffprobe`; raw recording does not):
 
 ```bash
-# Run recording scenario (saves 1x original video + telemetry)
+# Headless recording: saves 1x original video + telemetry, including inference/waits
 uv run fbu record --scenario wikipedia
 
 # Render labeled preview (target <= 10s with preserved original)
@@ -324,6 +378,8 @@ Run the full local test and guard suite:
 ```bash
 uv run ruff check .
 uv run pytest
+# Also run tiny random-model PyTorch tests without downloading pretrained weights:
+uv run --extra torch pytest tests/test_torch_backend.py
 node --check fast_browser_use/static/app.js
 node --check fast_browser_use/snapshot.js
 uv run python scripts/check_guards.py

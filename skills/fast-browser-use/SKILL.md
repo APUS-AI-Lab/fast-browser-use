@@ -1,6 +1,6 @@
 ---
 name: fast-browser-use
-description: Operate web pages with a local model through the fbu CLI on Apple Silicon. Use for browser navigation, searches, standard forms and dropdowns when the user wants local inference; accept any starting URL and natural-language goal.
+description: Operate web pages with a local model through the fbu CLI on Linux, Windows or macOS (PyTorch CUDA/CPU or Apple Silicon MLX). Use for browser navigation, searches, standard forms and dropdowns when the user wants local inference; accept any starting URL and natural-language goal.
 ---
 
 # Fast Browser Use
@@ -17,8 +17,16 @@ do not assume a same-named PyPI package is this project. `uv tool install` expos
 projects; `uv tool update-shell` and restarting the host may be needed for PATH discovery.
 
 Prepare an installed runtime once with `fbu install-browser` and `fbu download`. The supported model is
-Qwen3.5-9B MLX 4-bit (~5.95 GB weights), pinned by default. `FBU_MODEL` can point to an existing
-copy of these weights. Other model architectures/sizes are rejected. V1 requires Apple Silicon macOS and MLX.
+Qwen3.5-9B, pinned by default. Apple Silicon uses MLX 4-bit (~5.95 GB weights). Other platforms use the
+`torch` extra and original Qwen3.5-9B weights; MLX and PyTorch weight formats are not interchangeable.
+`FBU_BACKEND=auto` selects MLX on Apple Silicon and PyTorch elsewhere. `FBU_MODEL` can point to
+matching local weights; remove stale overrides when switching backends. Other architectures/sizes are rejected.
+
+For a Linux server, run `uv sync --locked --extra torch`, `uv run fbu install-browser --with-deps`,
+and `uv run fbu download --backend torch`. Run tasks with `--backend torch --device cuda` (or `cpu`).
+`cuda:N` selects a visible GPU. CUDA defaults to BF16 when supported, otherwise FP16; CPU uses FP32.
+Allow roughly 18 GB for BF16/FP16 weights plus runtime memory, or 36 GB for FP32 weights alone.
+No desktop, DISPLAY or Xvfb is needed. Windows uses the same CLI without `--with-deps`.
 
 From a checkout, use `uv run --project /absolute/path/to/fast-browser-use fbu` in place of `fbu` after
 `uv sync --locked`. Resolve model and trace paths against the user's working directory.
@@ -64,8 +72,8 @@ fbu record --url 'https://target.example/' --goal 'The requested outcome' \
 ```
 
 Custom recordings require a URL, goal and at least one outcome assertion. `--scenario` options are
-optional development demos, not a supported-sites list. Raw recordings preserve all inference and
-waits. From the checkout, `scripts/render_demo.py RECORDING_DIR --name task --max-seconds 10`
+optional development demos, not a supported-sites list. Recordings always use headless Chromium, including when `FBU_HEADLESS=0` is set.
+Raw recordings preserve all inference and waits. Preview rendering requires system ffmpeg/ffprobe. From the checkout, `scripts/render_demo.py RECORDING_DIR --name task --max-seconds 10`
 creates a labeled accelerated preview, preserves the original video, and records actual task time
 and playback speed separately. Only independently verified completed runs can be rendered.
 

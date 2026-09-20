@@ -5,12 +5,12 @@
 # Fast Browser Use
 
 **面向 Claude Code、Codex、OpenCode 等 Agent 的端侧极速“系统 1”浏览器自动化引擎与 Agent Skill。**  
-*基于 Apple Silicon MLX 与 Qwen3.5-9B 本地运行。零云端推理、秒级反射决策、从结构上彻底杜绝选择器幻觉。*
+*基于 Qwen3.5-9B，通过 MLX 或 PyTorch（CUDA / CPU）本地运行。零云端推理、秒级反射决策、从结构上彻底杜绝选择器幻觉。*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Platform: Apple Silicon](https://img.shields.io/badge/Platform-macOS%20Apple%20Silicon%20(MLX)-black.svg)](https://github.com/ml-explore/mlx)
-[![Model: Qwen3.5-9B-4bit](https://img.shields.io/badge/Model-Qwen3.5--9B--4bit-purple.svg)](https://huggingface.co/mlx-community/Qwen2.5-Coder-7B-Instruct-4bit)
+[![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linuxwindowsgpu-服务器pytorch)
+[![Model: Qwen3.5-9B-4bit](https://img.shields.io/badge/Model-Qwen3.5--9B--4bit-purple.svg)](https://huggingface.co/Qwen/Qwen3.5-9B)
 [![Cloud Inference: None](https://img.shields.io/badge/云端推理-零调用%20(%20100%25%20离线本地%20)-orange.svg)](#-本地端侧架构)
 [![Agent Skill: Claude Code & Codex](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%7C%20Codex-brightgreen.svg)](skills/fast-browser-use/SKILL.md)
 
@@ -58,7 +58,7 @@ TypeSafe AI 由此提出了“系统 1”决策模型的理念：将 GPT、Claud
 
 | 维度 | 传统云端多模态 Agent | Fast Browser Use（本地系统 1） |
 | :--- | :--- | :--- |
-| **推理位置** | 云端商业 API（OpenAI / Anthropic 等） | **100% 本地运行**（Apple Silicon MLX） |
+| **推理位置** | 云端商业 API（OpenAI / Anthropic 等） | **100% 本地运行**（MLX 或 PyTorch CUDA / CPU） |
 | **单步交互延迟** | 3,000 – 8,000 ms（网络往返 + 逐字解码） | **秒级响应**（纯 Logits 投影前向） |
 | **决策模式** | 自由文本 / 自回归 JSON 代码生成 | **受限离散候选中做单选**（单 Token） |
 | **选择器可靠性** | 频繁出现选择器幻觉（找不到元素） | **从结构上零幻觉**（仅扫描可见真实 DOM） |
@@ -169,8 +169,8 @@ $$P(c_i \mid \text{Context}) = \frac{\exp(z_i / T)}{\sum_{j=1}^K \exp(z_j / T)}$
 ## 🚀 快速上手
 
 ### 环境要求
-- **硬件**：Apple Silicon Mac（推荐 M 系列芯片，建议 16 GB 或以上统一内存）
-- **系统与运行环境**：macOS, Python 3.12+, [uv 包管理器](https://docs.astral.sh/uv/getting-started/installation/)
+- **硬件**：MLX 使用 Apple Silicon；PyTorch 使用 NVIDIA GPU 或 CPU，内存要求见下文。
+- **系统与运行环境**：Linux、Windows 或 macOS，Python 3.12+， [uv 包管理器](https://docs.astral.sh/uv/getting-started/installation/)
 - **依赖工具**：Node.js / npm（用于 `npx skills` 安装），Git
 
 ---
@@ -186,6 +186,8 @@ npx skills add APUS-AI-Lab/fast-browser-use --skill fast-browser-use -a claude-c
 ```
 
 #### 第二步：全局安装运行环境与模型权重
+
+以下为 Apple Silicon / MLX 安装方式；其它平台请使用下方 PyTorch 配置。
 ```bash
 # 1. 在独立隔离环境中全局安装 fbu 命令
 uv tool install --python 3.12 "git+https://github.com/APUS-AI-Lab/fast-browser-use.git"
@@ -212,6 +214,51 @@ $fast-browser-use 打开 https://en.wikipedia.org/wiki/Main_Page，找到 Python
 ```
 
 ---
+
+### Linux、Windows、GPU 服务器（PyTorch）
+
+`torch` 可选依赖包含 PyTorch、Transformers 和 Accelerate。默认 `FBU_BACKEND=auto` 在
+Apple Silicon 上选择 MLX，其它平台选择 PyTorch；可通过 `--backend torch` 显式指定。
+
+```bash
+# 在远程 Linux GPU 服务器的项目目录内执行
+uv sync --locked --extra torch --python 3.12
+uv run fbu install-browser --with-deps
+uv run fbu download --backend torch
+uv run fbu record --backend torch --device cuda --scenario wikipedia
+```
+
+`--with-deps` 安装 Chromium 的 Linux 系统依赖，可能需要 root/sudo 权限。操作和录屏无需桌面、
+`DISPLAY`、Xvfb、VNC 或 inspector。原速 `browser.webm`、截图、trace 和独立验证结果保存在服务器上。
+
+需要全局 CLI 时：
+
+```bash
+uv tool install --python 3.12 'fast-browser-use[torch] @ git+https://github.com/APUS-AI-Lab/fast-browser-use.git'
+fbu install-browser --with-deps  # Windows/macOS 去掉 --with-deps
+fbu download --backend torch
+```
+
+PyTorch 使用固定版本的原版 [Qwen/Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B)，通过
+[Transformers 纯文本加载器](https://huggingface.co/docs/transformers/model_doc/qwen3_5) 运行。
+**MLX 4-bit 权重不能用于 PyTorch**；切换后端时清除旧 `FBU_MODEL`，或将其指向匹配的本地权重目录。
+PyTorch 从 Hugging Face 下载；现有 ModelScope 镜像仅用于 MLX。下载后设置 `HF_HUB_OFFLINE=1`
+可禁止后续 Hub 访问，访问在线网页仍需网络。
+
+| 参数 | 默认值与可选值 |
+| :--- | :--- |
+| `FBU_BACKEND` / `--backend` | `auto`、`mlx`、`torch` |
+| `FBU_DEVICE` / `--device` | `auto` 优先使用可用 CUDA，否则 CPU；支持 `cpu`、`cuda`、`cuda:N` |
+| `FBU_DTYPE` / `--dtype` | `auto` 在 CUDA 上优先 BF16，否则 FP16；CPU 默认 FP32。可指定 `bfloat16`、`float16`、`float32` |
+| `FBU_MODEL` | 当前后端的固定版本仓库，或匹配的本地权重目录 |
+
+CUDA 使用指定的单张 GPU，编号遵循 PyTorch 可见设备（包括 `CUDA_VISIBLE_DEVICES`）。如果无法识别 GPU，
+请安装[与驱动匹配的 PyTorch 构建](https://pytorch.org/get-started/locally/)。Windows PowerShell 可使用相同 CLI，
+设置环境变量的语法为 `$env:FBU_BACKEND='torch'`。
+
+9B 的 BF16/FP16 权重本身约需 18 GB，另需缓存和计算空间；24 GB GPU 可作为起点，但不保证所有页面均可容纳。
+CPU 默认 FP32，权重本身约需 36 GB，速度也会慢很多。当前 PyTorch 后端不加载 4-bit 权重，也不跨 GPU 分片。
+无需安装可选 DeltaNet 加速内核。现有性能数据均来自 MLX；PyTorch 每次候选打分重新计算提示，不跨决策复用前缀缓存。
 
 ### 💻 独立 CLI 运行与 CI 业务断言
 
@@ -303,7 +350,9 @@ with Agent("https://example.com", "Open the More information link.") as agent:
 
 ## 🎥 录屏演示与复现
 
-生成包含真实等待与推理耗时的可审计录屏：
+录屏固定使用 headless Chromium，即使设置了调试用的 `FBU_HEADLESS=0` 也不会打开窗口。
+Playwright 直接采集浏览器画面，无需桌面录屏。原速视频保留真实等待与推理耗时；
+生成预览需额外安装 `ffmpeg`/`ffprobe`，原始录屏无需该系统命令：
 
 ```bash
 # 执行录屏场景（保留 1x 原始视频与全量 telemetry）
@@ -322,6 +371,8 @@ uv run python scripts/render_demo.py artifacts/recordings/<timestamp> --max-seco
 ```bash
 uv run ruff check .
 uv run pytest
+# 使用随机初始化的小模型验证 PyTorch，不下载预训练权重：
+uv run --extra torch pytest tests/test_torch_backend.py
 node --check fast_browser_use/static/app.js
 node --check fast_browser_use/snapshot.js
 uv run python scripts/check_guards.py

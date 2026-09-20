@@ -11,13 +11,13 @@ from .questions import MAX_STEPS
 
 
 class Agent:
-    def __init__(self, url, goals, *, record_dir=None, screenshots=False, video_dir=None, viewport=None):
+    def __init__(self, url, goals, *, record_dir=None, screenshots=False, video_dir=None, viewport=None, headless=None):
         task = goals.strip() if isinstance(goals, str) else "\n".join(goals).strip()
         if not task:
             raise ValueError("Supply a task")
         plan = [task]
         self.pending_text = None
-        self.browser = Browser(url, video_dir=video_dir, viewport=viewport)
+        self.browser = Browser(url, video_dir=video_dir, viewport=viewport, headless=headless)
         self.record_dir = Path(record_dir) if record_dir else None
         self.screenshots = screenshots or bool(record_dir)
         try:

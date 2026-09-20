@@ -87,10 +87,14 @@ draw.text((side, 650), f"{summary.get('plan_calls', 0)} local planning calls", f
 if summary.get("reasoning_calls"):
     draw.text((side, 679), f"{summary['reasoning_calls']} deliberation calls", font=font(18), fill=muted)
 draw.text((side, 705), trace.get("model_label", "QWEN3.5 9B"), font=font(20, True), fill=green)
-draw.text((side, 744), "MLX / 4-bit", font=font(20), fill=muted)
-draw.text((side, 797), trace["hardware"].get("chip", "Apple Silicon"), font=font(20), fill=ink)
+inference = trace.get("inference", {"backend": "mlx", "dtype": "4-bit", "device": "metal"})
+draw.text((side, 744), f"{inference['backend'].upper()} / {inference['dtype'].removeprefix('torch.')}",
+          font=font(20), fill=muted)
+draw.text((side, 797), trace["hardware"].get("chip", trace["hardware"].get("machine", "Unknown")),
+          font=font(20), fill=ink)
 memory_gb = trace["hardware"].get("memory_bytes", 0) // 1024**3
-draw.text((side, 835), f"{memory_gb} GB unified memory", font=font(18), fill=muted)
+draw.text((side, 835), f"{memory_gb} GB memory" if memory_gb else f"Device: {inference['device']}",
+          font=font(18), fill=muted)
 draw.text(
     (33, height + 218),
     ("Original timing. " if speed == 1 else f"{speed}x playback; original recording {raw_seconds:.2f}s. ")
@@ -192,6 +196,7 @@ evidence["final_page"] = {k: trace["page"][k] for k in ("url", "title")}
 evidence["recorded_at"] = trace.get("recorded_at")
 evidence["local_deliberation"] = trace.get("local_deliberation", False)
 evidence["configuration"] = trace.get("configuration")
+evidence["inference"] = inference
 evidence["rejections"] = trace.get("rejections", [])
 evidence["observations"] = trace.get("observations", [])
 evidence["browser_locale"] = trace.get("browser_locale")

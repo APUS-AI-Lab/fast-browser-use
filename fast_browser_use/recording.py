@@ -12,7 +12,7 @@ import time
 from datetime import datetime, timezone
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from .agent import Agent
@@ -36,6 +36,14 @@ HUD = """(() => {
  };
  if(document.documentElement) attach();else addEventListener('DOMContentLoaded',attach,{once:true});
 })()"""
+
+
+def runtime_versions():
+    installed = {}
+    for name in ("mlx", "mlx-lm", "torch", "accelerate", "transformers", "playwright"):
+        with contextlib.suppress(PackageNotFoundError):
+            installed[name] = version(name)
+    return installed
 
 
 def record(output=None, *, scenario=None, url=None, goal=None, expected=None):
@@ -71,7 +79,14 @@ def record(output=None, *, scenario=None, url=None, goal=None, expected=None):
         goal = "Find and open the Wikipedia article about Python, the programming language."
     elif scenario == "flights":
         url = "https://www.google.com/travel/flights?hl=en"
-    agent = Agent(url, goal, video_dir=folder / "raw")
+    try:
+        # Playwright captures Chromium frames without a desktop, DISPLAY or Xvfb.
+        agent = Agent(url, goal, video_dir=folder / "raw", headless=True)
+    except BaseException:
+        if server:
+            server.shutdown()
+            server.server_close()
+        raise
     error = None
     model_label = "LOCAL " + engine.name.rsplit("/", 1)[-1].replace("-it-4bit", "").replace("-", " ").upper()
     started = time.perf_counter()
@@ -136,7 +151,8 @@ def record(output=None, *, scenario=None, url=None, goal=None, expected=None):
                 chip=subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"], text=True).strip(),
                 memory_bytes=int(subprocess.check_output(["sysctl", "-n", "hw.memsize"], text=True).strip()),
             )
-        result["runtime"] = {name: version(name) for name in ("mlx", "mlx-lm", "transformers", "playwright")}
+        result["runtime"] = runtime_versions()
+        result["inference"] = {"backend": engine.backend, "device": str(engine.device), "dtype": str(engine.dtype)}
         result["model"] = engine.name
         result["model_label"] = model_label.removeprefix("LOCAL ")
         result["model_revision"] = engine.revision

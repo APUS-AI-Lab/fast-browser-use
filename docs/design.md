@@ -2,12 +2,12 @@
 
 The reference is [Jev Ultrafast](https://github.com/browser-use/jev-ultrafast).
 The guarded DOM reader, action executor, fixture and inspector are adapted under MIT.
-This project uses an isolated Playwright Chromium context and local MLX inference.
+This project uses an isolated Playwright Chromium context and local MLX or PyTorch inference.
 It does not wrap the `browser-use.Agent` class or call Jev/TypeSafe.
 
 ## Full-goal execution
 
-Qwen3.5-9B MLX 4-bit is the only supported model. The default `FBU_PLAN=0` works directly on
+Qwen3.5-9B is the supported model: MLX 4-bit on Apple Silicon, or original weights through PyTorch on CUDA/CPU. The default `FBU_PLAN=0` works directly on
 the complete user goal with no generated checklist, task-specific action plan or prepared field text.
 An optional diagnostic `FBU_PLAN=1` asks the same model for a bounded subgoal checklist. Its planner
 uses the request and observed form labels on compact pages, or the request alone on large pages.
@@ -75,12 +75,23 @@ exactly a JSON object with one nonempty string `text`. The executor never prepar
 
 ## Caching and model compatibility
 
-The loader validates the Qwen3.5-9B architecture dimensions and 4-bit configuration before loading
-weights. It uses the upstream MLX-LM text backend, which excludes vision weights and strictly checks
-the language-model tensors. No alternate-model adapters are included. Hugging Face and ModelScope
-have separate pinned repository revisions; the measured weights, tokenizer and chat template match.
+Both loaders validate Qwen3.5-9B architecture dimensions before loading weights. MLX additionally
+requires the 4-bit configuration and uses the upstream MLX-LM text backend. PyTorch requires original,
+unquantized weights and uses Transformers' Qwen3_5ForCausalLM text loader with local-only loading and
+remote code disabled. It rejects missing/mismatched language tensors. Vision weights are excluded.
+MLX and PyTorch have separate pinned Hugging Face revisions; the ModelScope mirror is MLX-only.
 
-The policy and current subgoal form an invariant prefix. Completion checks and action scoring use separate cache slots. A cached prefix is reused only when its token IDs match
+`FBU_BACKEND=auto` selects MLX on Apple Silicon and PyTorch elsewhere. The `torch` extra installs the
+optional PyTorch dependencies. `FBU_DEVICE=auto` selects available CUDA or CPU; `cuda:N` selects one
+visible GPU. Automatic precision is BF16 on supported CUDA devices, FP16 on other CUDA devices, and
+FP32 on CPU. Explicit unsupported/unavailable devices fail instead of silently moving inference.
+The PyTorch backend scores only candidate token IDs in float32 after a single prompt forward pass,
+projecting only the last hidden state into vocabulary logits. It currently uses no prefix cache across
+decisions (`cached_tokens=0`, `cache_hit=false`). Text, planning and optional thinking use greedy local
+decoding with a fresh hybrid attention cache per call. Both backends share the tokenizer chat template,
+JSON parsing, candidate-code validation and browser guards. Existing MLX timings do not describe PyTorch.
+
+In MLX, the policy and current subgoal form an invariant prefix. Completion checks and action scoring use separate cache slots. A cached prefix is reused only when its token IDs match
 exactly. Each decision gets a deep copy of the complete model cache, including rotating and shared-KV
 structures supported by MLX. Dynamic page tokens are always evaluated again. Planning and text generation have their own fresh caches. New observations do not reuse old DOM action mappings.
 
@@ -104,3 +115,14 @@ probability of success. The inspector labels these values as scores.
 The local inspector binds to loopback, checks Host and Origin, and requires a per-process token for
 mutations. One worker owns Playwright and serializes all commands. Browser sessions are isolated
 from the user's everyday profile.
+
+## Headless recording
+
+`fbu record` explicitly launches headless Chromium, overriding the interactive `FBU_HEADLESS=0`
+setting. Playwright records browser frames directly into WebM, with no desktop, DISPLAY or Xvfb.
+Blocking local inference and waits remain in the original timing. Context close finalizes the video
+before it is saved as `browser.webm`. Tests use a local page, simulated blocking inference, independent
+success/failure checks and ffprobe to verify the original duration. No test downloads model weights.
+Runtime metadata includes only installed distributions, plus the selected backend, device and dtype.
+Preview labels use this metadata rather than assuming MLX or Apple hardware. Rendering a labeled
+accelerated preview requires system ffmpeg/ffprobe and preserves the original recording.

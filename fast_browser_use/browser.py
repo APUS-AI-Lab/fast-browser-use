@@ -19,11 +19,11 @@ class StalePage(ValueError):
 
 
 class Browser:
-    def __init__(self, url, *, video_dir=None, viewport=None):
+    def __init__(self, url, *, video_dir=None, viewport=None, headless=None):
         self.driver = sync_playwright().start()
         self.chrome = None
         try:
-            self.headless = os.environ.get("FBU_HEADLESS", "1") != "0"
+            self.headless = os.environ.get("FBU_HEADLESS", "1") != "0" if headless is None else headless
             self.chrome = self.driver.chromium.launch(headless=self.headless)
             self.locale = os.environ.get("FBU_LOCALE", "en-US")
             options = {
