@@ -9,7 +9,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linuxwindowsgpu-服务器pytorch)
+[![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linuxwindowsgpu-pytorch)
 [![Model: Qwen3.5-9B | 35B-A3B](https://img.shields.io/badge/Model-Qwen3.5--9B%20%7C%2035B--A3B-purple.svg)](https://huggingface.co/Qwen)
 [![Cloud Inference: None](https://img.shields.io/badge/云端推理-零调用%20(%20100%25%20离线本地%20)-orange.svg)](#-本地端侧架构)
 [![Agent Skill: Claude Code & Codex](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%7C%20Codex-brightgreen.svg)](skills/fast-browser-use/SKILL.md)
@@ -21,9 +21,9 @@
 ---
 
 <div align="center">
-<a href="docs/qwen35b-demo.mp4"><img src="docs/qwen35b-demo.gif" alt="本地 Qwen3.5-35B-A3B 浏览器真实操作，明确标注为 3x 倍速播放" width="100%" /></a>
+<a href="docs/qwen9b-demo.mp4"><img src="docs/qwen9b-demo.gif" alt="本地 Qwen3.5-9B 浏览器真实操作，100% 本地 GPU 推理，1x 原速真实播放" width="100%" /></a>
 
-**[录屏预览（3× 倍速播放）](docs/qwen35b-demo.mp4)** · **[实测遥测数据（JSON）](docs/qwen35b-demo-measurement.json)** · **[性能基准与测试协议](docs/performance.md)**
+**[录屏预览（1× 原速真实播放）](docs/qwen9b-demo.mp4)** · **[实测遥测数据（JSON）](docs/qwen9b-demo-measurement.json)** · **[性能基准与测试协议](docs/performance.md)**
 </div>
 
 > **Jev 离散决策范式的开源逆向实现 · 纯本地 Browser-Use Agent Skill**  
@@ -137,10 +137,10 @@ $$P(c_i \mid \text{Context}) = \frac{\exp(z_i / T)}{\sum_{j=1}^K \exp(z_j / T)}$
 
 ## ⚡ 实测基准数据
 
-以下数据均在消费级设备上使用 **100% 本地推理**（无任何云端推理请求；真实网页仍需联网）：
-- **运行设备**：Apple Silicon Mac（Apple M2 Pro，32 GB 统一内存，macOS）
-- **推理后端**：MLX 0.32.2 / MLX-LM 0.31.3
-- **基线模型**：`Qwen3.5-9B MLX 4-bit` 与 `Qwen3.5-35B-A3B MLX 4-bit`
+以下数据均在 NVIDIA RTX PRO 6000 Blackwell Workstation (96 GB 显存)上使用 **100% 本地推理**（无任何云端推理请求；真实网页仍需联网）：
+- **运行设备**：NVIDIA RTX PRO 6000 Blackwell Workstation (96 GB 显存，Linux x86_64)
+- **推理后端**：PyTorch 2.14.0 (CUDA 13.0) + Flash Linear Attention (`fla`) + `causal-conv1d` 原生硬件算子
+- **基线模型**：`Qwen3.5-9B` (BF16) 与 `Qwen3.5-35B-A3B` (BF16)
 
 ### 1. Wikipedia 维基百科真实任务实测
 
@@ -148,10 +148,10 @@ $$P(c_i \mid \text{Context}) = \frac{\exp(z_i / T)}{\sum_{j=1}^K \exp(z_j / T)}$
 
 | 测试轮次 | Qwen3.5-9B 耗时 | Qwen3.5-35B-A3B 耗时 |
 | :---: | :---: | :---: |
-| 第 1 次 | 30.079 秒 | 19.152 秒 |
-| 第 2 次 | 30.440 秒 | 18.902 秒 |
-| 第 3 次 | 30.091 秒 | 18.834 秒 |
-| **中位数** | **30.091 秒** | **18.902 秒** |
+| 第 1 次 | 4.055 秒 | 8.221 秒 |
+| 第 2 次 | 3.935 秒 | 4.933 秒 |
+| 第 3 次 | 4.067 秒 | 4.944 秒 |
+| **中位数** | **4.055 秒** | **4.944 秒** |
 
 *全流程仅需 4 次单 Token 快速打分即可完成全目标操作。*
 
@@ -159,11 +159,11 @@ $$P(c_i \mid \text{Context}) = \frac{\exp(z_i / T)}{\sum_{j=1}^K \exp(z_j / T)}$
 
 | 任务用例 | Qwen3.5-9B 耗时 | Qwen3.5-35B-A3B 耗时 | 包含动作 | 独立业务断言 |
 | :--- | :---: | :---: | :---: | :--- |
-| **Wikipedia 维基百科长程任务**（检索并打开 Python 词条） | **30.091 秒** | **18.902 秒** | 搜索聚焦、输入、结果选择、完成 | 严格核验最终 URL 与页面标题 |
-| **工作区偏好设置表单**（名称、时区、开启周报） | **12.002 秒** | — | 输入、下拉选择、复选框勾选、保存 | 严格核验最终提示文本中的三项保存值 |
-| **本地阅读室文章导航** | **5.430 秒** | — | 列表检索、链接点击 | 精确匹配目标 URL 与文章标题 |
-| **Python.org 官网导航**（跳转 About 页面） | **8.095 秒** | — | 导航栏识别、跨页跳转 | 精确匹配目标页面 URL (`.../about/`) |
-| **Example.com → IANA 信息页导航** | **7.309 秒** | — | 锚点识别、域名跳转 | 精确匹配目标页面 URL |
+| **Wikipedia 维基百科长程任务**（检索并打开 Python 词条） | **4.055 秒** | **4.944 秒** | 搜索聚焦、输入、结果选择、完成 | 严格核验最终 URL 与页面标题 |
+| **工作区偏好设置表单**（名称、时区、开启周报） | **2.488 秒** | **3.360 秒** | 输入、下拉选择、复选框勾选、保存 | 严格核验最终提示文本中的三项保存值 |
+| **本地阅读室文章导航** | **0.808 秒** | **1.049 秒** | 列表检索、链接点击 | 精确匹配目标 URL 与文章标题 |
+| **Python.org 官网导航**（跳转 About 页面） | **1.789 秒** | **2.120 秒** | 导航栏识别、跨页跳转 | 精确匹配目标页面 URL (`.../about/`) |
+| **Example.com → IANA 信息页导航** | **1.263 秒** | **1.535 秒** | 锚点识别、域名跳转 | 精确匹配目标页面 URL |
 
 ---
 
@@ -216,13 +216,13 @@ $fast-browser-use 打开 https://en.wikipedia.org/wiki/Main_Page，找到 Python
 
 ---
 
-### Linux、Windows、GPU 服务器（PyTorch）
+### Linux、Windows、GPU（PyTorch）
 
 `torch` 可选依赖包含 PyTorch、Transformers 和 Accelerate。默认 `FBU_BACKEND=auto` 在
 Apple Silicon 上选择 MLX，其它平台选择 PyTorch；可通过 `--backend torch` 显式指定。
 
 ```bash
-# 在远程 Linux GPU 服务器的项目目录内执行
+# 在 Linux GPU 环境的项目目录内执行
 uv sync --locked --extra torch --python 3.12
 uv run fbu install-browser --with-deps
 
@@ -262,11 +262,6 @@ PyTorch 从 Hugging Face 下载；现有 ModelScope 镜像仅用于 MLX。下载
 CUDA 使用指定的单张 GPU，编号遵循 PyTorch 可见设备（包括 `CUDA_VISIBLE_DEVICES`）。如果无法识别 GPU，
 请安装[与驱动匹配的 PyTorch 构建](https://pytorch.org/get-started/locally/)。Windows PowerShell 可使用相同 CLI，
 设置环境变量的语法为 `$env:FBU_BACKEND='torch'`。
-
-9B 的 BF16/FP16 权重本身约需 18 GB，另需缓存和计算空间；24 GB GPU 可作为起点，但不保证所有页面均可容纳。
-35B-A3B 的 BF16/FP16 权重本身约需 70 GB（总参数 35B，每个 token 激活约 3B），建议 80 GB GPU（如 A100/H100 80GB）。
-CPU 默认 FP32，速度会慢很多。当前 PyTorch 后端不加载 4-bit 权重，也不跨 GPU 分片。
-无需安装可选 DeltaNet 加速内核。现有性能数据均来自 MLX；PyTorch 每次候选打分重新计算提示，不跨决策复用前缀缓存。
 
 ### 💻 独立 CLI 运行与 CI 业务断言
 

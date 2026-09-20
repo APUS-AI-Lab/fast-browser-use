@@ -78,9 +78,10 @@ Full scenario specifications and outcome expectations are defined in [benchmarks
 
 ## Demo Video & Telemetry
 
-- **[Recording Preview (3× Playback)](qwen35b-demo.mp4)** · **[Telemetry Measurement (JSON)](qwen35b-demo-measurement.json)**
+- **[Qwen3.5-9B GPU Preview (1× Original Playback)](qwen9b-demo.mp4)** · **[Telemetry Measurement (JSON)](qwen9b-demo-measurement.json)**
+- **[Qwen3.5-35B Preview (3× Playback)](qwen35b-demo.mp4)** · **[Telemetry Measurement (JSON)](qwen35b-demo-measurement.json)**
 - **[Settings Form MP4 (2× Playback)](workspace-demo.mp4)** · **[Form Telemetry (JSON)](workspace-demo-measurement.json)**
 
-The video preview uses the median Wikipedia run with Qwen3.5-35B-A3B (**18.902 s actual task time**). The preview runs at **3× playback with no cuts**, visibly labeled on-screen. Setup time, verification, and an explicit one-second final hold account for total recording duration.
+The primary video preview features the fastest GPU Wikipedia run with Qwen3.5-9B (**3.935 s actual task time**). Running in **1× unaccelerated real-time playback (no cuts)**, the entire sequence (including initial navigation and outcome verification) completes within 6.2 seconds. Setup time, verification, and an explicit final hold account for total recording duration.
 
-Playback acceleration is purely a preview convenience; reported task execution times always reflect actual unaccelerated wall-clock time.
+Playback acceleration is purely a preview convenience for slower baselines; reported task execution times always reflect actual unaccelerated wall-clock time.

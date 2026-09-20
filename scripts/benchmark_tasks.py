@@ -15,12 +15,12 @@ import threading
 from datetime import datetime, timezone
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from importlib.metadata import version
 from pathlib import Path
 
 from fast_browser_use import Agent
 from fast_browser_use.demo import ROOT
 from fast_browser_use.model import get_model
+from fast_browser_use.recording import runtime_versions
 from fast_browser_use.verification import validate_expectations, verify_outcome
 
 
@@ -81,7 +81,7 @@ def main():
                 print(json.dumps(row), flush=True)
         summary = {
             "model": engine.name, "model_revision": engine.revision,
-            "runtime": {name: version(name) for name in ("mlx", "mlx-lm", "playwright")},
+            "runtime": runtime_versions(),
             "platform": platform.platform(),
             "source_hashes": {
                 str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()

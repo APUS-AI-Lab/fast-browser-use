@@ -9,7 +9,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linux--windows--gpu-servers-pytorch)
+[![Platform: Cross-platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-black.svg)](#linux--windows--gpu-pytorch)
 [![Model: Qwen3.5-9B | 35B-A3B](https://img.shields.io/badge/Model-Qwen3.5--9B%20%7C%2035B--A3B-purple.svg)](https://huggingface.co/Qwen)
 [![Cloud Inference: None](https://img.shields.io/badge/Cloud%20API-Zero%20(%20100%25%20Offline%20)-orange.svg)](#-local-first-architecture)
 [![Agent Skill: Claude Code & Codex](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%7C%20Codex-brightgreen.svg)](skills/fast-browser-use/SKILL.md)
@@ -21,9 +21,9 @@
 ---
 
 <div align="center">
-<a href="docs/qwen35b-demo.mp4"><img src="docs/qwen35b-demo.gif" alt="Local Qwen3.5-35B-A3B browser run, clearly labeled 3x playback" width="100%" /></a>
+<a href="docs/qwen9b-demo.mp4"><img src="docs/qwen9b-demo.gif" alt="Local Qwen3.5-9B browser run on GPU, 1x real-time original playback" width="100%" /></a>
 
-**[Recording preview (3× playback acceleration)](docs/qwen35b-demo.mp4)** · **[Measurement Telemetry (JSON)](docs/qwen35b-demo-measurement.json)** · **[Performance Benchmarks](docs/performance.md)**
+**[Recording preview (1× original playback)](docs/qwen9b-demo.mp4)** · **[Measurement Telemetry (JSON)](docs/qwen9b-demo-measurement.json)** · **[Performance Benchmarks](docs/performance.md)**
 </div>
 
 > **Open-Source Reverse Engineering of Jev · Pure Local Browser-Use Agent Skill**  
@@ -136,10 +136,10 @@ A fast model without rigorous guardrails is brittle. Fast Browser Use wraps loca
 
 ## ⚡ Benchmarks & Measurements
 
-All measurements below were collected on consumer-grade hardware with **100% local inference** (zero cloud API requests):
-- **Hardware**: Apple Silicon Mac (Apple M2 Pro, 32 GB unified memory, macOS)
-- **Inference Stack**: MLX 0.32.2 / MLX-LM 0.31.3
-- **Evaluated Models**: `Qwen3.5-9B MLX 4-bit` & `Qwen3.5-35B-A3B MLX 4-bit`
+All measurements below were collected on NVIDIA RTX PRO 6000 Blackwell Workstation (96 GB VRAM) with **100% local inference** (zero cloud API requests):
+- **Hardware**: NVIDIA RTX PRO 6000 Blackwell Workstation (96 GB VRAM, Linux x86_64)
+- **Inference Stack**: PyTorch 2.14.0 (CUDA 13.0) + Flash Linear Attention (`fla`) + `causal-conv1d` native hardware kernels
+- **Evaluated Models**: `Qwen3.5-9B` (BF16) & `Qwen3.5-35B-A3B` (BF16)
 
 ### 1. Wikipedia End-to-End Live Navigation
 
@@ -147,10 +147,10 @@ Task: *"Find and open the Wikipedia article about Python (programming language) 
 
 | Run Trial | Qwen3.5-9B Task Time | Qwen3.5-35B-A3B Task Time |
 | :---: | :---: | :---: |
-| Trial 1 | 30.079 s | 19.152 s |
-| Trial 2 | 30.440 s | 18.902 s |
-| Trial 3 | 30.091 s | 18.834 s |
-| **Median** | **30.091 s** | **18.902 s** |
+| Trial 1 | 4.055 s | 8.221 s |
+| Trial 2 | 3.935 s | 4.933 s |
+| Trial 3 | 4.067 s | 4.944 s |
+| **Median** | **4.055 s** | **4.944 s** |
 
 *Task completed in 4 discrete single-token scoring steps.*
 
@@ -158,11 +158,11 @@ Task: *"Find and open the Wikipedia article about Python (programming language) 
 
 | Scenario & Task | Qwen3.5-9B Task Time | Qwen3.5-35B-A3B Task Time | Actions Executed | Independent Verification |
 | :--- | :---: | :---: | :---: | :--- |
-| **Wikipedia Navigation** (Find & open Python article) | **30.091 s** | **18.902 s** | Search focus, fill, select result, done | Strict match on final canonical URL & page title |
-| **Workspace Settings Form** (Name, timezone dropdown, toggle weekly digest) | **12.002 s** | — | Fill, Select, Toggle, Save | Exact match on saved confirmation notification |
-| **Local Reading Room Navigation** | **5.430 s** | — | Search, Link Click | Exact match on target article URL and title |
-| **Python.org Navigation** (Navigate to About page) | **8.095 s** | — | Nav menu hover & click | Exact match on target `/about/` URL |
-| **Example.com → IANA Info** | **7.309 s** | — | Anchor detection & jump | Exact match on destination domain |
+| **Wikipedia Navigation** (Find & open Python article) | **4.055 s** | **4.944 s** | Search focus, fill, select result, done | Strict match on final canonical URL & page title |
+| **Workspace Settings Form** (Name, timezone dropdown, toggle weekly digest) | **2.488 s** | **3.360 s** | Fill, Select, Toggle, Save | Exact match on saved confirmation notification |
+| **Local Reading Room Navigation** | **0.808 s** | **1.049 s** | Search, Link Click | Exact match on target article URL and title |
+| **Python.org Navigation** (Navigate to About page) | **1.789 s** | **2.120 s** | Nav menu hover & click | Exact match on target `/about/` URL |
+| **Example.com → IANA Info** | **1.263 s** | **1.535 s** | Anchor detection & jump | Exact match on destination domain |
 
 ---
 
@@ -215,13 +215,13 @@ $fast-browser-use Open https://en.wikipedia.org/wiki/Main_Page, find the Python 
 
 ---
 
-### Linux / Windows / GPU servers (PyTorch)
+### Linux / Windows / GPU (PyTorch)
 
 The `torch` extra adds PyTorch, Transformers and Accelerate. `FBU_BACKEND=auto` selects MLX on
 Apple Silicon and PyTorch elsewhere; `--backend torch` selects PyTorch explicitly.
 
 ```bash
-# From a checkout on a Linux GPU server
+# From a checkout in a Linux GPU environment
 uv sync --locked --extra torch --python 3.12
 uv run fbu install-browser --with-deps
 
@@ -266,13 +266,6 @@ CUDA runs on one selected GPU; `cuda:N` uses the index visible to PyTorch (inclu
 `CUDA_VISIBLE_DEVICES`). Install a [PyTorch build matching your GPU driver](https://pytorch.org/get-started/locally/)
 if the installed build does not expose CUDA. On Windows, the same CLI works from PowerShell;
 use `$env:FBU_BACKEND='torch'` when setting environment variables.
-
-Allow roughly 18 GB for 9B BF16/FP16 weights alone, plus cache and working memory; a 24 GB GPU is a
-starting point. For 35B-A3B unquantized BF16/FP16 weights (roughly 70 GB alone; 35B total / 3B active parameters),
-an 80 GB GPU (such as an A100/H100) is recommended.
-CPU defaults to FP32 and is significantly slower. Current PyTorch execution does not load 4-bit weights or shard across multiple GPUs.
-Optional optimized DeltaNet kernels are not required. Existing latency measurements are MLX results;
-PyTorch currently recomputes the prompt for each score and does not reuse a prefix between decisions.
 
 ### 💻 Standalone CLI Usage & CI Assertions
 
