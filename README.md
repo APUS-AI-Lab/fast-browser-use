@@ -169,9 +169,62 @@ Task: *"Find and open the Wikipedia article about Python (programming language) 
 ## 🚀 Quickstart
 
 ### Prerequisites
-- **Hardware**: Apple Silicon for MLX; NVIDIA GPU or CPU for PyTorch. See memory requirements below.
 - **System**: Linux, Windows or macOS; Python 3.12+, [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - **Optional**: Node.js / npm (for `npx skills` installation)
+- **Hardware**: Apple M1/M2/M3/M4/M5 chips (for MLX); or NVIDIA GPU or CPU supporting PyTorch
+
+Fast Browser Use runs 100% locally with zero cloud API calls. Recommended configurations:
+
+<table>
+  <thead>
+    <tr>
+      <th align="center">Platform / Device</th>
+      <th align="center">Recommended Backend</th>
+      <th align="center">Recommended Model</th>
+      <th align="center">Minimum Memory</th>
+      <th align="left">Peak Runtime Memory / VRAM</th>
+      <th align="left">Recommended Hardware</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2" align="center"><strong>Apple Silicon Mac<br>(M1 / M2 / M3 / M4 / M5)</strong></td>
+      <td rowspan="2" align="center"><strong>MLX</strong><br><code>(FBU_BACKEND=mlx)</code></td>
+      <td align="center"><code>Qwen3.5-9B MLX 4-bit</code></td>
+      <td align="center"><strong>16 GB</strong></td>
+      <td>~6.5 – 7.5 GB</td>
+      <td>16 GB+ Unified Memory</td>
+    </tr>
+    <tr>
+      <td align="center"><code>Qwen3.5-35B-A3B MLX 4-bit</code></td>
+      <td align="center"><strong>32 GB</strong></td>
+      <td>~20.3 – 21.1 GB</td>
+      <td>36 GB / 48 GB / 64 GB+ Unified Memory</td>
+    </tr>
+    <tr>
+      <td rowspan="2" align="center"><strong>NVIDIA GPU<br>(Linux / Windows)</strong></td>
+      <td rowspan="2" align="center"><strong>PyTorch CUDA</strong><br><code>(FBU_BACKEND=torch)</code></td>
+      <td align="center"><code>Qwen3.5-9B BF16</code></td>
+      <td align="center"><strong>24 GB VRAM</strong></td>
+      <td>~20 – 22 GB VRAM</td>
+      <td>RTX 3090 / 4090 / 6000 Ada / A10 / A5000</td>
+    </tr>
+    <tr>
+      <td align="center"><code>Qwen3.5-35B-A3B BF16</code></td>
+      <td align="center"><strong>80 GB VRAM</strong></td>
+      <td>~75 – 80 GB VRAM</td>
+      <td>RTX PRO 6000 Blackwell (96 GB) / A100 / H100</td>
+    </tr>
+    <tr>
+      <td align="center"><strong>x86 / ARM CPU</strong></td>
+      <td align="center"><strong>PyTorch CPU</strong><br><code>(FBU_BACKEND=torch)</code></td>
+      <td align="center"><code>Qwen3.5-9B FP32/BF16</code></td>
+      <td align="center"><strong>32 GB RAM</strong></td>
+      <td>~20 – 24 GB RAM</td>
+      <td>Multi-core Workstation</td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 

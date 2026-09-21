@@ -170,9 +170,62 @@ $$P(c_i \mid \text{Context}) = \frac{\exp(z_i / T)}{\sum_{j=1}^K \exp(z_j / T)}$
 ## 🚀 快速上手
 
 ### 环境要求
-- **硬件**：MLX 使用 Apple Silicon；PyTorch 使用 NVIDIA GPU 或 CPU，内存要求见下文。
 - **系统与运行环境**：Linux、Windows 或 macOS，Python 3.12+， [uv 包管理器](https://docs.astral.sh/uv/getting-started/installation/)
 - **依赖工具**：Node.js / npm（用于 `npx skills` 安装），Git
+- **硬件**：Apple M1/M2/M3/M4/M5芯片（用于MLX）；或者支持PyTorch的nVidia GPU或CPU
+
+Fast Browser Use 采用 100% 本地运行 架构，无需任何云端 API 调用。建议配置：
+
+<table>
+  <thead>
+    <tr>
+      <th align="center">设备平台</th>
+      <th align="center">推荐运行后端</th>
+      <th align="center">推荐模型规格</th>
+      <th align="center">最低内存要求</th>
+      <th align="left">运行峰值内存/显存</th>
+      <th align="left">推荐机型与硬件配置</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2" align="center"><strong>Apple Silicon Mac<br>(M1 / M2 / M3 / M4 / M5)</strong></td>
+      <td rowspan="2" align="center"><strong>MLX</strong><br><code>(FBU_BACKEND=mlx)</code></td>
+      <td align="center"><code>Qwen3.5-9B MLX 4-bit</code></td>
+      <td align="center"><strong>16 GB</strong></td>
+      <td>约 6.5 – 7.5 GB</td>
+      <td>16 GB+ 统一内存</td>
+    </tr>
+    <tr>
+      <td align="center"><code>Qwen3.5-35B-A3B MLX 4-bit</code></td>
+      <td align="center"><strong>32 GB</strong></td>
+      <td>约 20.3 – 21.1 GB</td>
+      <td>36 GB / 48 GB / 64 GB+ 统一内存</td>
+    </tr>
+    <tr>
+      <td rowspan="2" align="center"><strong>NVIDIA GPU<br>(Linux / Windows)</strong></td>
+      <td rowspan="2" align="center"><strong>PyTorch CUDA</strong><br><code>(FBU_BACKEND=torch)</code></td>
+      <td align="center"><code>Qwen3.5-9B BF16</code></td>
+      <td align="center"><strong>24 GB 显存</strong></td>
+      <td>约 20 – 22 GB 显存</td>
+      <td>RTX 3090 / 4090 / 6000 Ada / A10 / A5000</td>
+    </tr>
+    <tr>
+      <td align="center"><code>Qwen3.5-35B-A3B BF16</code></td>
+      <td align="center"><strong>80 GB 显存</strong></td>
+      <td>约 75 – 80 GB 显存</td>
+      <td>RTX PRO 6000 Blackwell (96 GB) / A100 / H100</td>
+    </tr>
+    <tr>
+      <td align="center"><strong>x86 / ARM CPU</strong></td>
+      <td align="center"><strong>PyTorch CPU</strong><br><code>(FBU_BACKEND=torch)</code></td>
+      <td align="center"><code>Qwen3.5-9B FP32/BF16</code></td>
+      <td align="center"><strong>32 GB 内存</strong></td>
+      <td>约 20 – 24 GB 内存</td>
+      <td>多核心工作站</td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
